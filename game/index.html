@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Upload CSV</title>
+  <link rel="stylesheet" href="assets/styles.css">
+</head>
+<body>
+  <div id="dropZone" class="drop-zone">
+    Drag and drop your CSV file here or <label for="fileInput" class="file-label">Choose file</label>
+    <input type="file" id="fileInput" accept=".csv" style="display: none;">
+  </div>
+  <button id="virtualizeBtn" class="btn">Virtualize</button>  
+  
+  <script>
+    let filePath;
+
+    // Drag-and-drop support
+    const dropZone = document.getElementById('dropZone');
+    dropZone.addEventListener('dragover', (e) => e.preventDefault());
+    dropZone.addEventListener('drop', (e) => {
+      e.preventDefault();
+      filePath = e.dataTransfer.files[0].path;
+      alert('File uploaded: ' + filePath);
+    });
+
+    // File input selection support
+    const fileInput = document.getElementById('fileInput');
+    fileInput.addEventListener('change', (e) => {
+      filePath = e.target.files[0].path;
+      alert('File selected: ' + filePath);
+    });
+
+    document.getElementById('virtualizeBtn').addEventListener('click', () => {
+      if (!filePath) return alert('Please upload a file!');
+      localStorage.setItem('csvPath', filePath);
+      window.location.href = 'visualize.html';
+    });
+  </script>
+</body>
+</html>

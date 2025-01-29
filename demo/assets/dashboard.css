@@ -1,0 +1,387 @@
+.container {
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  max-width: 1200px;
+  margin: 20px auto; /* Add margin for breathing room */
+  font-family: 'Inter'; /* Modern font */
+  color: #333;
+}
+
+header {
+  background-color: #f8f9fa; /* Light grey background */
+  padding: 20px; /* Space around the text */
+  text-align: left; /* Center the text */
+  border-bottom: 2px solid #ddd; /* Optional border below the header */
+  margin-bottom: 5px;
+  border-radius: 10px;
+}
+
+header h1 {
+  font-size: 24px; /* Adjust font size */
+  color: #333; /* Dark text color */
+  margin: 0; /* Remove default margin */
+}
+
+/* Top and Bottom Sections */
+.top-section,
+.bottom-section {
+  display: flex;
+  width: 100%;
+  gap: 20px;
+  height: 400px; /* Fixed height */
+}
+
+/* Panels */
+.left-panel {
+  flex: 2;
+  display: flex;
+  flex-direction: column;
+  background-color: #f8f9fa;
+  border-radius: 10px;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1); /* Soft shadow */
+  padding: 15px; /* Inner spacing */
+  overflow: hidden; /* Prevent overflow issues */
+}
+
+/* .right-panel {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  background: linear-gradient(135deg, #f8f9fa, #e9ecef);
+  border-radius: 10px;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  padding: 15px;
+} */
+
+.right-panel {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  background: linear-gradient(135deg, #f8f9fa, #e9ecef);
+  border-radius: 10px;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  padding: 15px;
+  overflow: hidden; /* Prevents content overflow */
+  position: relative; /* Positions the canvas relative to this container */
+}
+
+canvas {
+  height: 100%;
+  width: 100%; /* Canvas will not exceed the width of its container
+  /* height: auto; Maintain aspect ratio */
+  display: block;
+  margin: 0 auto;
+}
+
+/* CSV Container - Modernized */
+.csv-container {
+  width: 100%;
+  height: 300px;
+  overflow: auto;
+  /* border: 5px solid #dee2e6; */
+  /* border-radius: 8px; */
+  background-color: #fff;
+  /* padding: 10px; */
+  box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.05); /* Slight inset shadow */
+}
+
+#csvTable {
+  width: 100%;
+  border-collapse: collapse;
+
+  /* max-height: 400px;  Set the max height of the table */
+  overflow-y: auto; 
+}
+
+#csvTable th,
+#csvTable td {
+  border: 1px solid #dee2e6;
+  padding: 10px;
+  text-align: left;
+}
+
+#csvTable th {
+  /* background-color: #e9ecef; */
+  /* font-weight: bold; */
+
+  position: sticky;
+  top: 0;
+  background-color: #f1f1f1;
+  z-index: 1;
+}
+
+#csvTable td {
+  background-color: #f8f9fa;
+}
+
+#sql-query-interface {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+}
+
+.query-container {
+  flex: 1;
+  display: flex;
+  gap: 1rem;
+}
+
+#query-view1,
+#query-view2 {
+  flex: 1; /* Allow both sections to take equal width */
+}
+
+#query-box,
+#rewritten-query-box {
+  width: 100%;
+  height: 200px;
+  padding: 15px;
+  border-radius: 8px;
+  background-color: #f1f3f5;
+  color: #495057;
+  border: 1px solid #ced4da;
+  resize: none;
+  flex-grow: 1;
+  box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.05);
+}
+
+/* Header and Button Group */
+/* Header and Toggle Button */
+.header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  width: 100%;
+  margin-top: -20px;
+}
+
+/* This accounts for the gap of "Query Output". */
+.special-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  width: 100%;
+  margin-top: -24px;
+}
+
+.very-special-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  width: 100%;
+  margin-top: 0px;
+}
+
+.button-group {
+  display: flex;
+  border: 1px solid #ccc; /* Single border for the button group */
+  border-radius: 4px;
+  overflow: hidden; /* Ensures rounded corners and no overflow */
+  margin-top: 5px;
+  margin-left: -15%;
+}
+
+.button-group1 {
+  width: 29%;
+  display: flex;
+  border: 1px solid #ccc; /* Single border for the button group */
+  border-radius: 4px;
+  overflow: hidden; /* Ensures rounded corners and no overflow */
+  margin-top: 5px;
+  margin-left: -40%;
+}
+
+.btn-option {
+  flex: 1; /* Makes buttons equal in width */
+  padding: 5px 15px;
+  font-size: 14px;
+  text-align: center;
+  background-color: #f9f9f9;
+  border: none; /* Remove inner button borders */
+  cursor: pointer;
+  transition: background-color 0.3s, color 0.3s;
+}
+
+.btn-option.active {
+  background-color: #007bff;
+  color: white;
+}
+
+.btn-option:not(.active) {
+  color: #000;
+}
+
+.btn-option:hover:not(.active) {
+  background-color: #e0e0e0; /* Slight hover effect for inactive buttons */
+}
+
+.switch {
+  position: relative;
+  display: inline-flex;
+  align-items: center;  /* Align the slider vertically with the text */
+}
+
+.switch-text {
+  font-size: 16px;
+  color: black;
+  margin-right: -17.5%;
+  /* margin-left: 20px; */
+  pointer-events: none;
+  display: flex;
+  align-items: center; 
+}
+
+.switch-text2 {
+  font-size: 16px;
+  color: black;
+  margin-right: -55%;
+  pointer-events: none;
+  display: flex;
+  align-items: center; 
+}
+
+.switch input {
+  opacity: 0;
+  width: 0;
+  height: 0;
+}
+
+.slider {
+  position: relative;
+  cursor: pointer;
+  width: 34px;  /* Adjust the width of the slider */
+  height: 20px; /* Adjust the height of the slider */
+  background-color: #ccc;
+  transition: 0.4s;
+  border-radius: 34px;
+}
+
+.slider:before {
+  position: absolute;
+  content: "";
+  height: 16px;  /* Adjust the circle size */
+  width: 16px;   /* Adjust the circle size */
+  border-radius: 50%;
+  left: 2px;
+  bottom: 2px;
+  background-color: white;
+  transition: 0.4s;
+}
+
+input:checked + .slider {
+  background-color: #29b6f6; /* Neon blue */
+}
+
+input:checked + .slider:before {
+  transform: translateX(14px); /* Adjust the position of the circle */
+}
+
+#query-results {
+  margin-top: 10px;
+  padding: 15px;
+  background-color: #f8f9fa;
+  border: 1px solid #dee2e6;
+  border-radius: 8px;
+  height: 100px;
+  overflow-y: auto;
+  box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.05);
+}
+
+.output-console {
+  font-family: "Courier New", Courier, monospace; /* Monospaced font for proper alignment */
+  white-space: pre-wrap; /* Ensure that long lines break and wrap */
+  background-color: #f8f9fa; /* Light background to match the theme */
+  padding: 5px;
+  /* border-radius: 5px; */
+  border: 1px solid #ddd; /* Light border */
+  /* box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1); */
+  overflow-x: auto; /* Enable horizontal scrolling if needed */
+  overflow-y: auto;
+  max-height: 400px;
+  max-width: 100%;
+  margin-top: 0px; /* Add some space above the output */
+}
+
+/* Ensure the table inside the output console has its own unique styles */
+.output-console table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-top: 0px;
+}
+
+.output-console th, .output-console td {
+  padding: 8px;
+  text-align: left;
+  border-bottom: 1px solid #ddd;
+}
+
+.output-console th {
+  background-color: #f1f3f5; /* Light header background */
+}
+
+.output-console td {
+  background-color: #ffffff;
+}
+
+.output-console tr:nth-child(even) td {
+  background-color: #f9f9f9; /* Alternating row background */
+}
+
+/* To avoid conflicts with other tables, make sure to target only the tables in the .output-console container */
+
+.formula-button {
+  padding: 8px 16px;
+  background-color: #007bff;
+  color: white;
+  border: 1px solid #0056b3;
+  border-radius: 3px;
+  font-size: 14px;
+  cursor: pointer;
+}
+
+.formula-button:hover {
+  background-color: #0056b3;
+}
+
+.formula-button:active {
+  background-color: #004494;
+}
+
+.run-button {
+  background-color: transparent;
+  border: 1px solid black;
+  padding: 5px 5px;
+  color: black;
+  opacity: 0.7;
+  margin-top: 4px;
+}
+
+.run-button:hover {
+  background-color: #007bff;
+  cursor: pointer;
+}
+
+/* Titles and Headings */
+
+
+/* Section Spacing */
+.top-section {
+  height: 400px;
+  margin-bottom: 10px;
+  gap: 10px;
+}
+
+.bottom-section {
+  height: 400px;
+  gap: 10px;
+  /* margin-top: 5px;  */
+}
+
+h2 code {
+  font-size: inherit; /* Make <code> text the same size as the <h2> */
+  font-family: "Courier New", Courier, monospace;
+  background-color: #f8f9fa; /* Optional: Light background to match the theme */
+  padding: 0 0px; /* Optional: Padding for spacing around the code */
+  border-radius: 3px; /* Optional: Rounded corners for the code block */
+}

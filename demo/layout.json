@@ -1,0 +1,35 @@
+{
+  "greedy": {
+    "obj-value": 72659,
+    "chosen": [
+      {
+        "target_index": 9,
+        "target_name": "Total Earnings",
+        "model_type": "sparse-lr",
+        "sparse-lr": {
+          "mse": 8.650392307908825e-11,
+          "intercept": -1.1641532182693481e-10,
+          "coeffs": [
+            {
+              "col_index": 7,
+              "col_name": "Regular Earnings",
+              "coeff": 1.000000000000003
+            },
+            {
+              "col_index": 8,
+              "col_name": "Overtime Earnings",
+              "coeff": 1.000000000000005
+            }
+          ]
+        },
+        "left": [
+          7,
+          8
+        ],
+        "right": 9,
+        "gain": 72659
+      }
+    ],
+    "time": 1.0967254638671875e-05
+  }
+}

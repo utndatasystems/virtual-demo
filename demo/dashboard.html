@@ -1,0 +1,551 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Preview CSV</title>
+
+  <!-- Add these inside the <head> tag or before </body> -->
+  <!-- <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.61.0/codemirror.min.css"> -->
+  <!-- <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.61.0/theme/neo.min.css"> -->
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+
+  <!-- <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet"> -->
+
+
+<!-- CodeMirror CSS -->
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.63.3/codemirror.min.css">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.63.3/theme/neo.css"> <!-- or your chosen theme -->
+<!-- <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.63.3/theme/material.css"> or your chosen theme -->
+
+
+
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.63.3/codemirror.min.js"></script>
+
+
+  <!-- CodeMirror Mode for SQL -->
+<!-- <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.63.3/mode/sql/sql.min.js"></script> -->
+
+
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.63.3/mode/sql/sql.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.61.0/addon/hint/sql-hint.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.61.0/addon/hint/show-hint.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.61.0/addon/lint/lint.min.js"></script>
+     <script type="text/javascript"
+     src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML">
+   </script>
+
+  <link rel="stylesheet" href="assets/dashboard.css">
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" rel="stylesheet">
+</head>
+<body>
+  <div class="container">
+    <header>
+      <div class="very-special-header">
+        <h1><a href="index.html" style="color: inherit; text-decoration: none;"><code>Virtual</code></a>: Dashboard</h1>
+        <div class="button-group1">
+          <button class="btn-option active" data-option="sample"><code>sample</code></button>
+          <button class="btn-option" data-option="lineitem"><code>lineitem (TPC-H)</code></button>
+        </div>
+      </div>
+    </header>    
+    <!-- Top Section -->
+    <div class="top-section">
+      <!-- CSV Preview -->
+      <div class="left-panel">
+        <div class="header">
+          <h2>🔍 Table Preview</h2>
+          <code class="switch-text2">Virtual view</code>
+          <label class="switch">
+            <input type="checkbox" id="toggle-virtual">
+            <span class="slider"></span>
+          </label>
+        </div>
+        <div class="csv-container">
+        <table id="csvTable"></table>
+        </div>
+      </div>
+      <!-- Functions -->
+      <div class="right-panel">
+        <div id="controls">
+          <div class="special-header">
+            <h2>📈 Functions</h2>
+          </div>
+          <div id="formulas"></div> <!-- This is where the formulas will be displayed -->
+          <h2>⚖️ File Size</h2>
+          <canvas id="barChart"></canvas> <!-- This is where the formulas will be displayed -->
+        </div>
+      </div>
+    </div>
+    <!-- Bottom Section -->
+    <div class="bottom-section">
+      <!-- SQL Query Interface -->
+      <div class="left-panel">
+        <div id="sql-query-interface" class="query-interface">
+          <div class="header">
+            <h2>📊 SQL Query Interface</h2>
+            <div class="button-group">
+              <button class="btn-option" data-option="parquet"><code>parquet</code></button>
+              <button class="btn-option active" data-option="virtual"><code>virtual</code></button>
+            </div>
+            <code class="switch-text">Show rewrite</code>
+            <label class="switch">
+              <input type="checkbox" id="toggle-query">
+              <span class="slider"></span>
+            </label>
+          </div>
+          <div class="query-container">
+            <div id="query-view1">
+              <textarea id="query-box" placeholder="Write your SQL query here..."></textarea>
+            </div>
+            <div id="query-view2" style="display: none;">
+              <textarea id="rewritten-query-box" placeholder="Rewritten SQL query..." readonly></textarea>
+            </div>
+          </div>
+          <button id="run-query" class="run-button" type="submit">
+            <i class="fas fa-play"></i>
+          </button>
+          <!-- <button id="run-query" class="btn"><i class="fas fa-play"></i></button>   -->
+        </div>
+      </div>
+      
+      <!-- Query Output -->
+      <div class="right-panel">
+        <div class="special-header">
+          <h2>📝 Query Output</h2>
+        </div>
+        <!-- <div id="output-console" class="output-console"> -->          
+          <pre id="query-output"></pre>
+        <!-- </div> -->
+      </div>
+    </div>
+  </div>  
+    
+  <script type="module">
+    // Retrieve CSV path.
+    const csvPath = localStorage.getItem('csvPath');
+    // const csvPath = '/Users/mihail/Documents/utn/compression/data-gov/Broome-County-Annual-Employee-Earnings:-Beginning-2009.csv'
+      // '/Users/mihail/Downloads/smcrds_csv/smcrds_utf8.csv'
+
+    // Read the sizes for this file.
+    const sizes = await fetch('sizes.json').then(res => res.json());
+    const functions = await fetch('layout.json').then(res => res.json());
+
+    console.log(functions);
+
+    // The editor settings.
+    const editor_settings = {
+      lineNumbers: true,
+      mode: "text/x-sql",
+      theme: "neo",   // Default theme (dark mode)
+      extraKeys: {
+        "Ctrl-Space": "autocomplete",
+      },
+      lineWrapping: true,
+      matchBrackets: true,
+      lint: true,
+      gutters: ["CodeMirror-linenumbers", "CodeMirror-lint-markers"]
+    };
+
+    // Instantiate the editors.
+    const editor = CodeMirror.fromTextArea(document.getElementById("query-box"), editor_settings);
+    const rewritten_editor = CodeMirror.fromTextArea(document.getElementById("rewritten-query-box"), editor_settings);
+
+    // Set readonly for the rewritten query.
+    rewritten_editor.setOption("readOnly", "nocursor");
+
+    // And refresh. This fixes the issue with line numbers.
+    rewritten_editor.refresh();
+
+    // Event for showing the rewrite.
+    document.getElementById("toggle-query").addEventListener("change", function (e) {
+      const view1 = document.getElementById("query-view1")
+      const view2 = document.getElementById("query-view2");      
+      const rewrittenQueryBox = document.getElementById("rewritten-query-box");
+      
+      if (e.target.checked) {
+        view2.style.display = "block";
+        rewritten_editor.setValue("select avg(\n \"Regular Earnings\" + \"Overtime Earnings\"\n) from table;");
+      } else {
+        view2.style.display = "none";
+      }
+    });
+
+    // Event for showing the virtual file.
+    document.getElementById("toggle-virtual").addEventListener("change", async (e) => {
+      console.log('sinide hre')
+      if (e.target.checked) {
+        await loadCsv('virtual.csv');
+      } else {
+        await loadCsv(csvPath)
+      }
+    });
+
+    // Execute query on button click
+    document.getElementById("run-query").addEventListener("click", async function() {
+      const query = editor.getValue();
+      document.getElementById("query-output").innerText = "Executing..";
+
+      // Get the active option from the button group
+      const active_format = document.querySelector('.button-group').querySelector('.btn-option.active').getAttribute('data-option');
+
+      // Send query to the main process to run the Python script
+      const result = await window.electronAPI.runQuery(query, csvPath, active_format);
+
+      const outputArea = document.getElementById("query-output");
+
+      // Clear the output area.
+      outputArea.innerHTML = "";
+
+      const timer = document.createElement('span');
+
+      // Also put the actual query time, if we deal with `virtual`.
+      if (active_format === 'virtual') {
+        timer.innerHTML = `Rewrite time: ${((result.query_time - result.metal_query_time) / 1e6).toFixed(2)} ms`
+        timer.innerHTML += `\nExecution time: ${(result.metal_query_time / 1e6).toFixed(2)} ms`
+      } else {
+        timer.innerHTML = `Query time: ${(result.query_time / 1e6).toFixed(2)} ms`
+      }
+
+      outputArea.appendChild(timer);
+      outputArea.appendChild(document.createElement('br'));
+      outputArea.appendChild(document.createElement('br'));
+
+      if (Array.isArray(result.data) && result.data.length > 0) {
+        // Clear existing results
+
+        // Create a table
+        const table = document.createElement("table");
+        table.style.borderCollapse = "collapse";
+        table.style.width = "100%";
+
+        // Create table headers
+        const headerRow = document.createElement("tr");
+        result.header.forEach((header) => {
+          const th = document.createElement("th");
+          th.style.border = "1px solid #ddd";
+          th.style.padding = "8px";
+          th.style.textAlign = "left";
+          th.innerText = header;
+          headerRow.appendChild(th);
+        });
+
+        console.log(headerRow);
+
+        table.appendChild(headerRow);
+
+        // Create table rows
+        result.data.forEach((row) => {
+          const tableRow = document.createElement("tr");
+          Object.values(row).forEach((cell) => {
+            const td = document.createElement("td");
+            td.style.border = "1px solid #ddd";
+            td.style.padding = "8px";
+            td.innerText = cell;
+            tableRow.appendChild(td);
+          });
+          table.appendChild(tableRow);
+        });
+
+        // Append table to the output area
+        outputArea.appendChild(table);
+      } else {
+        document.getElementById("query-output").innerText += "\nNo results found.";
+      }
+    });
+
+    // Load the CSV into the table
+    async function loadCsv(custom_csv_path) {
+      try {
+        console.log(custom_csv_path);
+        // Fetch the CSV data from the main process
+        let rows = await window.electronAPI.readCsv(custom_csv_path); // Assuming your Electron API provides this method
+        
+        console.log(rows);
+
+        // Check if the CSV data is empty or invalid
+        if (!rows || rows.length === 0) {
+          throw new Error('No data found in CSV file');
+        }
+
+        // Limit the number of rows to 1,000
+        rows = rows.slice(0, 1000);
+
+        const table = document.getElementById('csvTable'); // Assuming there's a table with id 'csvTable'
+        
+        // Create table header from the first row of the CSV data
+        const headerRow = Object.keys(rows[0]); // Use the keys of the first object as the header row
+        
+        // Clear any existing content in the table
+        table.innerHTML = '';
+
+        // Create table header
+        const thead = table.createTHead();
+        const header = thead.insertRow();
+        
+        headerRow.forEach(colName => {
+          const th = document.createElement('th');
+          th.textContent = colName;
+          th.addEventListener('click', () => generateSql(colName)); // Add click event to generate SQL for column
+          header.appendChild(th);
+        });
+
+        // Create table body
+        const tbody = table.createTBody();
+        rows.forEach((row, index) => {
+          const tr = tbody.insertRow();
+          headerRow.forEach(colName => {
+            const td = tr.insertCell();
+            td.textContent = row[colName]; // Access each cell value using the column name
+          });
+
+          // Add alternating row background color
+          if (index % 2 === 0) {
+            tr.style.backgroundColor = '#f9f9f9'; // Even rows
+          } else {
+            tr.style.backgroundColor = '#ffffff'; // Odd rows
+          }
+          
+          // Add hover effect for rows
+          tr.addEventListener('mouseover', () => {
+            tr.style.backgroundColor = '#f1f1f1';
+          });
+          tr.addEventListener('mouseout', () => {
+            tr.style.backgroundColor = index % 2 === 0 ? '#f9f9f9' : '#ffffff';
+          });
+        });
+      } catch (err) {
+        console.error('Error loading CSV:', err);
+        alert('Failed to load CSV. Please check the file path.');
+      }
+    }
+  
+    document.getElementById("toggle-query").addEventListener("change", function() {
+      const queryBox = document.getElementById("query-box");
+      
+      // Optimized Query - Replace with your actual optimized query
+      const optimizedQuery = "SELECT * FROM optimized_table WHERE condition = true;"; 
+      
+      // Check if the switch is turned on or off
+      if (this.checked) {
+        // When the switch is on, display the optimized query
+        queryBox.value = optimizedQuery;
+      } else {
+        // When the switch is off, clear the optimized query or return to original state
+        queryBox.value = "";
+      }
+    });
+
+    // // Display column size information from sizes.json
+    // function displayColumnSizes() {
+    //   const sizesContainer = document.getElementById('sizesContainer'); // Assuming there's a div with id 'sizesContainer'
+    //   sizesContainer.innerHTML = ''; // Clear any existing content
+  
+    //   for (const [column, size] of Object.entries(sizes)) {
+    //     const div = document.createElement('div');
+    //     div.textContent = `Column: ${column}, Size: ${size}`;
+    //     sizesContainer.appendChild(div);
+    //   }
+    // }
+
+    // Function to generate and display the formulas
+    function generateFormulas() {
+      const formulasContainer = document.getElementById('formulas');
+      
+      let myround = (x) => {
+        let int_repr = Math.round(x);
+        if (Math.abs(x - int_repr) < 1e-6) {
+          return int_repr;
+        } else {
+          return x.toFixed(4);
+        }
+      }
+
+      functions.greedy.chosen.forEach(item => {
+        const coeffs = item['sparse-lr'].coeffs;
+
+        // Create the formula in LaTeX format
+        const formula = coeffs.map(coeff => {
+          const rounded_coef = myround(coeff.coeff);
+          if (rounded_coef === 1) {
+            return `${coeff.col_name}`;
+          }
+          return `${rounded_coef} * ${coeff.col_name}`; // LaTeX with <code> style
+        }).join(' + ');
+
+        // Wrap the formula in LaTeX math syntax
+        const latexFormula = `<code>${item.target_name} = ${formula}</code>`;
+
+        // Create a button element to hold the formula and append it to the page
+        const formulaButton = document.createElement('button');
+        formulaButton.innerHTML = `${latexFormula}`; // MathJax will render this LaTeX code
+        formulaButton.classList.add('formula-button');
+
+        // Add click event listener to populate the SQL query textarea and editor
+        formulaButton.addEventListener('click', () => {
+          const queryBox = document.getElementById('query-box');
+
+          // Dynamically generate the AVG query
+          const avgQuery = `avg("${item.target_name}")`;
+
+          // Log the computed values
+          console.log('Formula:', formula);
+          console.log('AVG Query:', avgQuery);
+
+          // Update the editor with the AVG query
+          if (typeof editor !== 'undefined' && editor.setValue) {
+            editor.setValue(`select ${avgQuery}\nfrom table;`);
+          }
+
+          // Update the query box for reference
+          queryBox.value = `${item.target_name} = ${formula}`;
+        });
+
+        formulasContainer.appendChild(formulaButton);
+      });
+    }
+
+    // // Additional styles for the buttons (optional)
+    // document.querySelectorAll('.formula-button').forEach(button => {
+    //   button.style.cursor = 'pointer';
+    // });
+
+    // function generateSizes() {
+    //   const sizesContainer = document.getElementById('sizes');
+    //   for (const key in sizes) {
+    //     const size_span = document.createElement('span');
+    //     size_span.innerHTML = `<code>${key}: ${sizes[key] / 1000000} MB</code>`;
+    //     sizesContainer.appendChild(size_span);
+    //     // New line after each span
+    //     sizesContainer.appendChild(document.createElement('br'));
+    //   }
+    // }
+
+    function generateSizes() {
+  // Data for the chart
+  // const sizes = { virtual: 5000000, parquet: 12000000 }; // Example data
+  const labels = Object.keys(sizes); // ["virtual", "parquet"]
+    const data = Object.values(sizes).map(size => size / 1000000); // Convert to MB
+    const colors = ['#95393a', '#b97f45', '#1f80df']; // Colors for the bars
+
+    // Create the bar chart
+    const ctx = document.getElementById('barChart').getContext('2d');
+    new Chart(ctx, {
+      type: 'bar',
+      data: {
+        labels: labels,
+        datasets: [{
+          data: data,
+          backgroundColor: colors, // Bar colors
+          // borderColor: colors, // Border colors
+          borderWidth: 1
+        }]
+      },
+      options: {
+        plugins: {
+          legend: {
+            display: false, // Enable legend
+          },
+          tooltip: {
+            callbacks: {
+              label: function(tooltipItem) {
+                // Format the tooltip to show the value in MB
+                return tooltipItem.raw.toFixed(2) + ' MB';
+              }
+            }
+          }
+        },
+        scales: {
+          y: {
+            beginAtZero: true,
+            title: {
+              display: true,
+              text: 'Size (MB)',
+              font: {
+                size: 14 // Y-axis title font size
+              }
+            },
+            ticks: {
+              font: {
+                size: 12 // Y-axis tick font size
+              }
+            }
+          }
+        }
+      }
+    });
+  }
+
+    function generateSql(column) {
+      selectedColumn = column;
+      const query = `SELECT ${column} FROM csv`; // SQL query for selected column
+      showModal(query);
+    }
+
+    function showModal(query) {
+      const modal = document.getElementById('sqlModal');
+      const sqlQueryTextarea = document.getElementById('sqlQuery');
+      sqlQueryTextarea.value = query;
+      modal.style.display = 'block';
+    }
+
+    function closeModal() {
+      const modal = document.getElementById('sqlModal');
+      modal.style.display = 'none';
+    }
+
+    async function runSQLQuery() {
+      const query = document.getElementById('sqlQuery').value;
+      try {
+        const result = await window.electronAPI.runSQL(query); // Execute SQL in Electron
+
+
+        console.log(result);
+
+        alert(`Query Result:\n${JSON.stringify(result, null, 2)}`);
+      } catch (err) {
+        console.error('Error running SQL:', err);
+        alert('Failed to execute SQL query.');
+      }
+    }
+
+    // Toggle the option buttons.
+    document.querySelector('.button-group').querySelectorAll('.btn-option').forEach(button => {
+      button.addEventListener('click', () => {
+        // Remove active class from all buttons
+
+        console.log(button);
+        let option = button.getAttribute('data-option');
+        console.log(option);
+        if (option === 'parquet') {
+          // const view1 = document.getElementById("query-view1")
+          const view2 = document.getElementById("query-view2");      
+          // const rewrittenQueryBox = document.getElementById("rewritten-query-box");
+          
+          // if (e.target.checked) {
+            // view2.style.display = "block";
+            // rewritten_editor.setValue("select avg(\n \"Regular Earnings\" + \"Overtime Earnings\"\n) from table;");
+          // } else {
+          view2.style.display = "none";
+          document.getElementById('toggle-query').checked = false; 
+          // }
+        }
+
+        document.querySelector('.button-group').querySelectorAll('.btn-option').forEach(btn => btn.classList.remove('active'));
+        // Add active class to the clicked button
+        button.classList.add('active');
+      });
+    });
+  
+    // Initialize the script
+    (async function init() {
+      await loadCsv(csvPath);
+      console.log('here')
+      // displayColumnSizes();
+      generateFormulas();
+      generateSizes();
+    })();
+  </script>  
+</body>
+</html>
