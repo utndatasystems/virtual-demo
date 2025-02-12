@@ -1,7 +1,5 @@
 *.parquet
 *.json
-!sizes.json
-!layout.json
 tmp.csv
 virtual.csv
 
