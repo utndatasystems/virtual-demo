@@ -1,4 +1,5 @@
 *.parquet
+result/*
 
 # Node.js
 node_modules/
