@@ -43,7 +43,6 @@
         gap: 15px;
       }
 
-      /* Adjusted Result Box for Small Window */
       .result-box {
         background: rgba(255, 255, 255, 0.2);
         padding: 15px;
@@ -60,7 +59,6 @@
         font-size: 1.4rem;
       }
 
-      /* Styled Table */
       table {
         border-collapse: collapse;
         width: 100%;
@@ -84,15 +82,34 @@
         font-weight: bold;
       }
 
-      /* Summary Section */
       .summary {
         font-size: 1.2rem;
         margin-top: 10px;
         font-weight: bold;
       }
 
-      /* Back to Home Button */
-      .home-button {
+      footer {
+        display: flex;
+        justify-content: space-between; /* Push buttons to edges */
+        align-items: center;
+        padding: 10px 20px;
+        background: rgba(255, 255, 255, 0.2);
+        border-top: 2px solid rgba(255, 255, 255, 0.3);
+        backdrop-filter: blur(10px);
+        box-shadow: 0 -4px 10px rgba(0, 0, 0, 0.1);
+        position: relative;
+      }
+
+      /* Center the footer text */
+      .footer-text {
+        position: absolute;
+        left: 50%;
+        transform: translateX(-50%);
+        font-weight: bold;
+      }
+
+      /* Footer Buttons */
+      .footer-button {
         background: linear-gradient(135deg, #007bff, #00c6ff);
         color: white;
         font-size: 1rem;
@@ -103,27 +120,14 @@
         cursor: pointer;
         transition: all 0.3s ease;
         box-shadow: 0px 4px 10px rgba(255, 255, 255, 0.3);
-        margin-top: 15px;
       }
 
-      .home-button:hover {
+      .footer-button:hover {
         transform: scale(1.05);
         background: linear-gradient(135deg, #00c6ff, #007bff);
         box-shadow: 0px 6px 15px rgba(255, 255, 255, 0.6);
       }
 
-      footer {
-        display: flex;
-        justify-content: center;
-        padding: 10px 15px;
-        background: rgba(255, 255, 255, 0.2);
-        border-top: 2px solid rgba(255, 255, 255, 0.3);
-        backdrop-filter: blur(10px);
-        box-shadow: 0 -4px 10px rgba(0, 0, 0, 0.1);
-        font-size: 0.9rem;
-      }
-
-      /* Floating Animation */
       @keyframes float {
         0% {
           transform: translateY(0px);
@@ -151,7 +155,6 @@
         <h2>Congratulations, <span id="playerName"></span>! 🎉</h2>
         <p>Here is your quiz performance:</p>
 
-        <!-- Quiz Result Table -->
         <table>
           <thead>
             <tr>
@@ -163,16 +166,14 @@
           <tbody id="resultTableBody"></tbody>
         </table>
 
-        <!-- Summary -->
         <div class="summary">Total Correct: <span id="totalCorrect">0</span> / 5</div>
-
-        <!-- Back to Home Button -->
-        <button class="home-button" onclick="goHome()">🏠 Back to Home</button>
       </div>
     </div>
 
     <footer>
-      <span>✨ Well Done! Keep Practicing! ✨</span>
+      <button class="footer-button" onclick="goHome()">🏠 Back to Home</button>
+      <span class="footer-text">✨ Well Done! ✨</span>
+      <button class="footer-button" onclick="goLeaderboard()">🏆 Leaderboard</button>
     </footer>
 
     <script>
@@ -181,7 +182,7 @@
 
       async function loadResults() {
         try {
-          let resultData = await window.electronAPI.getResults(playerName); // Fetch results from backend
+          let resultData = await window.electronAPI.getResults(playerName);
           console.log("Results:", resultData);
 
           document.getElementById("playerName").textContent = playerName;
@@ -193,25 +194,22 @@
 
       function displayResults(quizResults) {
         const tableBody = document.getElementById("resultTableBody");
-        tableBody.innerHTML = ""; // Clear table before adding rows
+        tableBody.innerHTML = "";
 
         let totalCorrect = 0;
 
         quizResults.forEach((quiz, index) => {
           const tr = document.createElement("tr");
 
-          // Quiz Number
           const tdQuizNum = document.createElement("td");
           tdQuizNum.textContent = `Quiz ${index + 1}`;
           tr.appendChild(tdQuizNum);
 
-          // Correct/Incorrect
           const tdCorrect = document.createElement("td");
           tdCorrect.textContent = quiz.correct ? "✔ Correct" : "❌ Incorrect";
           tdCorrect.style.color = quiz.correct ? "lightgreen" : "lightcoral";
           tr.appendChild(tdCorrect);
 
-          // Time Spent
           const tdTime = document.createElement("td");
           tdTime.textContent = `${quiz.timeSpent}`;
           tr.appendChild(tdTime);
@@ -221,7 +219,6 @@
           if (quiz.correct) totalCorrect++;
         });
 
-        // Update total correct score
         document.getElementById("totalCorrect").textContent = `${totalCorrect}`;
       }
 
@@ -229,7 +226,10 @@
         window.location.href = "start.html";
       }
 
-      // Load results on page load
+      function goLeaderboard() {
+        window.location.href = "leaderboard.html";
+      }
+
       window.onload = loadResults;
     </script>
   </body>

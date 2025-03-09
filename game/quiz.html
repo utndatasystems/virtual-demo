@@ -192,7 +192,8 @@
     </div>
 
     <footer>
-      <button id="prevButton">←</button>
+      <!-- <button id="prevButton">←</button> -->
+      <button class="home-button" onclick="goHome()">🏠 Back to Home</button>
       <button id="nextButton">→</button>
     </footer>
 
@@ -201,6 +202,7 @@
       const timerElement = document.getElementById("timer");
       const params = new URLSearchParams(window.location.search);
       const quizNum = parseInt(params.get("quizNum"), 10) || 0;
+      document.getElementById("quiz_id").textContent = `${quizNum}`;
 
       // Timer function
       function updateTimer() {
@@ -264,36 +266,37 @@
         });
       }
 
-      function Verify() {
+      async function Verify() {
         const functionInput = document.getElementById("functionInput").value.trim();
 
         if (functionInput === "") {
           alert("Please enter a function before verifying.");
-          return;
+          return false;
         }
         window.electronAPI.runVerify(quizNum, functionInput, totalMilliseconds);
+        return true;
       }
 
-      document.getElementById("quiz_id").textContent = `${quizNum}`;
-      document.getElementById("prevButton").disabled = true;
-      document.getElementById("prevButton").style.visibility = "hidden";
-      // document.getElementById("prevButton").addEventListener("click", () => {
-      //   window.electronAPI.openQuiz(quizNum - 1);
-      // });
-      document.getElementById("nextButton").addEventListener("click", () => {
-        Verify();
-        window.electronAPI.openQuiz(quizNum + 1);
+      document.getElementById("nextButton").addEventListener("click", async () => {
+        const isVerified = await Verify(); // Wait for verification
+        console.log("isVerified", isVerified);
+
+        if (isVerified) {
+          window.electronAPI.openQuiz(quizNum + 1); // Move to the next quiz only if verified
+        }
       });
-      document.getElementById("verifyButton").addEventListener("click", () => {
-        Verify();
-        window.electronAPI.openQuiz(quizNum + 1);
+      document.getElementById("verifyButton").addEventListener("click", async () => {
+        const isVerified = await Verify(); // Wait for verification
+
+        if (isVerified) {
+          window.electronAPI.openQuiz(quizNum + 1); // Move to the next quiz only if verified
+        }
       });
-      // if (quizNum === 1) {
-      //   document.getElementById("prevButton").disabled = true;
-      //   document.getElementById("prevButton").style.visibility = "hidden";
-      // }
       if (quizNum === 6) {
         window.location.href = "name.html";
+      }
+      function goHome() {
+        window.location.href = "start.html";
       }
       window.onload = () => loadCSV(quizNum);
     </script>

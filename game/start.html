@@ -36,13 +36,6 @@
         box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
       }
 
-      /* Game Title */
-      header div {
-        display: flex;
-        align-items: center;
-        gap: 8px;
-      }
-
       /* Container Styling */
       .container {
         flex: 1;
@@ -80,15 +73,46 @@
       /* Footer Styling */
       footer {
         display: flex;
-        justify-content: center;
+        align-items: center;
         padding: 15px 20px;
         background: rgba(255, 255, 255, 0.2);
         border-top: 2px solid rgba(255, 255, 255, 0.3);
         backdrop-filter: blur(10px);
         box-shadow: 0 -4px 10px rgba(0, 0, 0, 0.1);
+        position: relative; /* Allows absolute positioning inside */
+        justify-content: flex-end; /* Leaderboard button stays on the right */
       }
 
-      /* Animated Floating Effect */
+      /* Absolutely centered footer text */
+      .footer-text {
+        position: absolute;
+        left: 50%;
+        transform: translateX(-50%);
+        font-weight: bold;
+      }
+
+      /* Leaderboard Button stays on the right */
+      .leaderboard-btn {
+        font-size: 1rem;
+        padding: 10px 20px;
+        border: none;
+        border-radius: 25px;
+        background: linear-gradient(135deg, #007bff, #00c6ff);
+        color: white;
+        cursor: pointer;
+        font-weight: bold;
+        transition: all 0.3s ease;
+        box-shadow: 0px 4px 10px rgba(255, 255, 255, 0.3);
+      }
+
+      /* Glowing Hover Effect for Leaderboard Button */
+      .leaderboard-btn:hover {
+        transform: scale(1.05);
+        background: linear-gradient(135deg, #00c6ff, #007bff);
+        box-shadow: 0px 6px 15px rgba(255, 255, 255, 0.6);
+      }
+
+      /* Floating Animation */
       @keyframes float {
         0% {
           transform: translateY(0px);
@@ -116,12 +140,17 @@
     </div>
 
     <footer>
-      <span>✨ Get Ready to Play! ✨</span>
+      <span class="footer-text">✨ Get Ready to Play! ✨</span>
+      <button id="leaderboardButton" class="leaderboard-btn">🏆 Leaderboard</button>
     </footer>
 
     <script>
       document.getElementById("startButton").addEventListener("click", () => {
         window.electronAPI.openQuiz(1);
+      });
+
+      document.getElementById("leaderboardButton").addEventListener("click", () => {
+        window.location.href = "leaderboard.html"; // Change if leaderboard has a different filename
       });
     </script>
   </body>

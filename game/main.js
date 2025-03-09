@@ -64,6 +64,19 @@ ipcMain.handle("getResults", (event, playerName) => {
   });
 });
 
+ipcMain.handle("getLeaderboard", async () => {
+  try {
+    const filePath = path.join(__dirname, "leaderboard.json"); // JSON file for leaderboard
+    const rawData = fs.readFileSync(filePath, "utf-8");
+    const leaderboard = JSON.parse(rawData);
+
+    return leaderboard; // Send leaderboard data to frontend
+  } catch (error) {
+    console.error("Error loading leaderboard:", error);
+    return [];
+  }
+});
+
 ipcMain.handle("verify", async (event, { quizNum, functionInput, totalSeconds }) => {
   return new Promise((resolve, reject) => {
     const pythonPath = "/usr/local/anaconda3/bin/python3";
