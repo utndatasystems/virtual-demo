@@ -86,20 +86,73 @@
       }
 
       /* Special Styling for Top 3 */
+      /* First Place Animation - Crown & Glowing Effect */
+      @keyframes crown-glow {
+        0% {
+          transform: scale(1);
+          box-shadow: 0 0 10px gold;
+        }
+        50% {
+          transform: scale(1.1);
+          box-shadow: 0 0 20px gold;
+        }
+        100% {
+          transform: scale(1);
+          box-shadow: 0 0 10px gold;
+        }
+      }
+
       .first-place {
         background: gold;
         color: black;
         font-weight: bold;
+        animation: crown-glow 1.5s infinite ease-in-out;
       }
+
+      /* Second Place - Smooth Glow */
+      @keyframes silver-glow {
+        0% {
+          transform: scale(1);
+          box-shadow: 0 0 10px silver;
+        }
+        50% {
+          transform: scale(1.05);
+          box-shadow: 0 0 20px silver;
+        }
+        100% {
+          transform: scale(1);
+          box-shadow: 0 0 10px silver;
+        }
+      }
+
       .second-place {
         background: silver;
         color: black;
         font-weight: bold;
+        animation: silver-glow 1.5s infinite ease-in-out;
       }
+
+      /* Third Place - Subtle Bounce Effect */
+      @keyframes bronze-bounce {
+        0% {
+          transform: scale(1);
+          box-shadow: 0 0 10px #cd7f32;
+        }
+        50% {
+          transform: scale(1.01);
+          box-shadow: 0 0 20px #cd7f32;
+        }
+        100% {
+          transform: scale(1);
+          box-shadow: 0 0 10px #cd7f32;
+        }
+      }
+
       .third-place {
         background: #cd7f32;
         color: black;
         font-weight: bold;
+        animation: bronze-bounce 1.2s infinite ease-in-out;
       }
 
       /* Go Home Button */
@@ -216,6 +269,18 @@
           // Rank
           const tdRank = document.createElement("td");
           tdRank.textContent = index + 1;
+
+          // Add crown for 1st place
+          if (index === 0) {
+            tdRank.innerHTML = "👑 1st"; // Crown emoji for top rank
+          } else if (index === 1) {
+            tdRank.innerHTML = "🥈 2nd"; // Silver medal
+          } else if (index === 2) {
+            tdRank.innerHTML = "🥉 3rd"; // Bronze medal
+          } else {
+            tdRank.textContent = index + 1;
+          }
+
           tr.appendChild(tdRank);
 
           // Player Name
