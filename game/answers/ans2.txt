@@ -1,4 +1,3 @@
-a = b * c
-a = c * b
-b = a / c
-c = a / b
+r = p * q + 1
+p = (r - 1) / q
+q = (r - 1) / p
