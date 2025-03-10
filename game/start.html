@@ -140,13 +140,13 @@
     </div>
 
     <footer>
-      <span class="footer-text">✨ Get Ready to Play! ✨</span>
+      <span class="footer-text">✨ Get ready to play! ✨</span>
       <button id="leaderboardButton" class="leaderboard-btn">🏆 Leaderboard</button>
     </footer>
 
     <script>
       document.getElementById("startButton").addEventListener("click", () => {
-        window.electronAPI.openQuiz(1);
+        window.electronAPI.openQuiz(1, 0);
       });
 
       document.getElementById("leaderboardButton").addEventListener("click", () => {

@@ -21,7 +21,7 @@ def is_correct(user_input, correct_equations):
 
         return False  # No match found
     except Exception as e:
-        print(e)
+        # print(e)
         return False
 
 # Read arguments from Electron

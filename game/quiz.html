@@ -162,9 +162,9 @@
         }
       }
 
-      .right button {
+      /* .right button {
         animation: float 2s infinite ease-in-out;
-      }
+      } */
     </style>
   </head>
   <body>
@@ -198,11 +198,14 @@
     </footer>
 
     <script>
-      let totalMilliseconds = 0;
+      // let totalMilliseconds = 0;
       const timerElement = document.getElementById("timer");
       const params = new URLSearchParams(window.location.search);
       const quizNum = parseInt(params.get("quizNum"), 10) || 0;
+      let totalMilliseconds = parseInt(params.get("timeStart"), 10) || 0;
+      const startTime = totalMilliseconds;
       document.getElementById("quiz_id").textContent = `${quizNum}`;
+      console.log("quizNum", quizNum);
 
       // Timer function
       function updateTimer() {
@@ -273,7 +276,7 @@
           alert("Please enter a function before verifying.");
           return false;
         }
-        window.electronAPI.runVerify(quizNum, functionInput, totalMilliseconds);
+        window.electronAPI.runVerify(quizNum, functionInput, totalMilliseconds - startTime);
         return true;
       }
 
@@ -282,14 +285,14 @@
         console.log("isVerified", isVerified);
 
         if (isVerified) {
-          window.electronAPI.openQuiz(quizNum + 1); // Move to the next quiz only if verified
+          window.electronAPI.openQuiz(quizNum + 1, totalMilliseconds); // Move to the next quiz only if verified
         }
       });
       document.getElementById("verifyButton").addEventListener("click", async () => {
         const isVerified = await Verify(); // Wait for verification
 
         if (isVerified) {
-          window.electronAPI.openQuiz(quizNum + 1); // Move to the next quiz only if verified
+          window.electronAPI.openQuiz(quizNum + 1, totalMilliseconds); // Move to the next quiz only if verified
         }
       });
       if (quizNum === 6) {
