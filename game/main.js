@@ -26,7 +26,6 @@ app.on("ready", () => {
 });
 
 ipcMain.handle("open-quiz", (event, { quizNum, timeStart }) => {
-  console.log("Opening quiz", quizNum, "at", timeStart);
   mainWindow.loadURL(
     `file://${path.join(__dirname, "quiz.html")}?quizNum=${quizNum}&timeStart=${timeStart}`
   );

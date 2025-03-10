@@ -269,11 +269,13 @@
         });
       }
 
-      async function Verify() {
+      async function Verify(isSkip = false) {
         const functionInput = document.getElementById("functionInput").value.trim();
 
         if (functionInput === "") {
-          alert("Please enter a function before verifying.");
+          if (!isSkip) {
+            alert("Please enter a function before verifying.");
+          }
           return false;
         }
         window.electronAPI.runVerify(quizNum, functionInput, totalMilliseconds - startTime);
@@ -281,11 +283,21 @@
       }
 
       document.getElementById("nextButton").addEventListener("click", async () => {
-        const isVerified = await Verify(); // Wait for verification
+        const isVerified = await Verify((isSkip = true)); // Wait for verification
         console.log("isVerified", isVerified);
 
         if (isVerified) {
           window.electronAPI.openQuiz(quizNum + 1, totalMilliseconds); // Move to the next quiz only if verified
+        } else {
+          // Show confirmation dialog before skipping
+          const confirmSkip = window.confirm(
+            "You haven't verified your answer. Do you want to skip?"
+          );
+
+          if (confirmSkip) {
+            window.electronAPI.runVerify(quizNum, "None", totalMilliseconds - startTime);
+            window.electronAPI.openQuiz(quizNum + 1, totalMilliseconds); // Skip to the next quiz
+          }
         }
       });
       document.getElementById("verifyButton").addEventListener("click", async () => {
