@@ -6,9 +6,9 @@ If you want to run the `demo`, please do:
 
 # Setup
 
-First, you need to install `virtual`:
+First, you need to install `virtual` and other libraries:
 
-`pip3 install virtual-parquet`
+`pip3 install -r requirements.txt`
 
 You probably need to install `node` and `npm`.
 
@@ -26,4 +26,3 @@ brew install npm
 # Run
 
 `npm start`
-
