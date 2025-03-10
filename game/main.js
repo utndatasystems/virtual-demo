@@ -17,7 +17,7 @@ app.on("ready", () => {
     }
   });
 
-  mainWindow.loadFile("start.html");
+  mainWindow.loadFile("index.html");
 
   // Register a global shortcut (Ctrl+Shift+I or Cmd+Opt+I on macOS) to toggle DevTools
   globalShortcut.register("Ctrl+Shift+I", () => {
