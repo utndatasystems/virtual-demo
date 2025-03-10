@@ -31,7 +31,7 @@ ipcMain.handle("open-quiz", (event, quizNum) => {
 
 ipcMain.handle("getResults", (event, playerName) => {
   return new Promise((resolve, reject) => {
-    const pythonPath = "/usr/local/anaconda3/bin/python3"; // Adjust path if needed
+    const pythonPath = "python"; // Adjust path if needed
     const scriptPath = path.join(__dirname, "result.py");
 
     const process = spawn(pythonPath, [scriptPath, playerName]);
@@ -79,7 +79,7 @@ ipcMain.handle("getLeaderboard", async () => {
 
 ipcMain.handle("verify", async (event, { quizNum, functionInput, totalSeconds }) => {
   return new Promise((resolve, reject) => {
-    const pythonPath = "/usr/local/anaconda3/bin/python3";
+    const pythonPath = "python";
     const scriptPath = path.join(__dirname, "verify.py");
 
     const process = spawn(pythonPath, [scriptPath, quizNum, functionInput, totalSeconds]);
