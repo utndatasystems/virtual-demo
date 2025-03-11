@@ -54,6 +54,16 @@
         overflow: hidden;
       }
 
+      .left,
+      .right {
+        flex: 1; /* Ensures both sections take equal space */
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        padding: 20px;
+        overflow: hidden;
+      }
+
       /* Start Game Button */
       .btn {
         font-size: 1.5rem;
@@ -182,13 +192,16 @@
       footer {
         position: relative;
         width: 100%;
-        padding: 10px;
+        padding: 20px 20px;
         text-align: center;
         background: rgba(255, 255, 255, 0.2);
         border-top: 2px solid rgba(255, 255, 255, 0.3);
         backdrop-filter: blur(10px);
         box-shadow: 0 -4px 10px rgba(0, 0, 0, 0.1);
         font-weight: bold;
+        display: flex;
+        align-items: center; /* Centers text vertically */
+        justify-content: center; /* Centers text horizontally */
       }
     </style>
   </head>
