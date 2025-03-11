@@ -3,7 +3,7 @@ import os
 import json
 
 LEADERBOARD_FILE = "leaderboard.json"
-RESULTS_DIR = "../results"
+RESULTS_DIR = "results"
 
 def format_time(milliseconds):
     """Convert time from milliseconds to MM:SS.mm format."""
