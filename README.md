@@ -6,11 +6,11 @@ If you want to run the `demo`, please do:
 
 # Setup
 
-First, you need to install `virtual` and other libraries:
+Let's install the requirements:
 
-`pip3 install -r requirements.txt`
+`pip install -r requirements.txt`
 
-You probably need to install `node` and `npm`.
+Also install `node` and `npm`.
 
 ## MacOS
 
