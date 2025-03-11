@@ -283,10 +283,7 @@
 
         timerPaused = true;
 
-        const waitingWindow = window.open("", "Waiting", "width=300,height=150");
-        waitingWindow.document.write(
-          "<p style='text-align:center;font-size:18px;'>⏳ Verifying...</p>"
-        );
+        const waitingWindow = window.open("waiting.html", "Waiting", "width=300,height=300");
 
         try {
           let result = await window.electronAPI.runVerify(
@@ -301,16 +298,11 @@
           waitingWindow.close();
 
           // Show result window based on verification
-          const resultWindow = window.open("", "Result", "width=300,height=150");
-          if (result.trim().toLowerCase() === "true") {
-            resultWindow.document.write(
-              "<p style='text-align:center;font-size:18px;color:green;'>✅ Correct!</p>"
-            );
-          } else {
-            resultWindow.document.write(
-              "<p style='text-align:center;font-size:18px;color:red;'>❌ Incorrect!</p>"
-            );
-          }
+          const resultWindow = window.open(
+            `showResult.html?correct=${result.trim().toLowerCase() === "true"}`,
+            "Result",
+            "width=300,height=300"
+          );
           return new Promise((resolve) => {
             let timeElapsed = 0;
             const timeoutLimit = 5000; // 5 seconds timeout
