@@ -161,10 +161,6 @@
           transform: translateY(0px);
         }
       }
-
-      /* .right button {
-        animation: float 2s infinite ease-in-out;
-      } */
     </style>
   </head>
   <body>
@@ -299,7 +295,7 @@
 
           // Show result window based on verification
           const resultWindow = window.open(
-            `showResult.html?correct=${result.trim().toLowerCase() === "true"}`,
+            `showResult.html?correct=${result.toString()}`,
             "Result",
             "width=300,height=300"
           );
@@ -342,7 +338,13 @@
           );
 
           if (confirmSkip) {
-            window.electronAPI.runVerify(quizNum, "None", startTime - totalMilliseconds);
+            timerPaused = true;
+            let result = await window.electronAPI.runVerify(
+              quizNum,
+              "None",
+              startTime - totalMilliseconds
+            );
+            timerPaused = false;
             window.electronAPI.openQuiz(quizNum + 1, totalMilliseconds); // Skip to the next quiz
           }
         }

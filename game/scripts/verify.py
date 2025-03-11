@@ -36,10 +36,13 @@ else:
     with open("tmp.json", "r") as file:
         data = json.load(file)
 
-csv_path = os.path.join(os.path.dirname(__file__), "../quizs", f"quiz{quizNum}.csv")
+if functionInput != "None":
+    csv_path = os.path.join(os.path.dirname(__file__), "../quizs", f"quiz{quizNum}.csv")
 
-df = pd.read_csv(csv_path)
-status = is_correct(df, functionInput.replace("=", "=="))
+    df = pd.read_csv(csv_path)
+    status = is_correct(df, functionInput.replace("=", "=="))
+else:
+    status = False
 
 data[quizNum] = {
     "input": functionInput,
