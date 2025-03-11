@@ -1,46 +1,46 @@
-const { app, BrowserWindow, ipcMain, globalShortcut } = require('electron');
-const { spawn } = require('child_process')
-const path = require('path');
-const fs = require('fs');
-const fsp = require('fs/promises');
-const csv = require('csv-parser');  // Assuming you're using a library for CSV parsing
-const nodecallspython = require('node-calls-python');
+const { app, BrowserWindow, ipcMain, globalShortcut } = require("electron");
+const { spawn } = require("child_process");
+const path = require("path");
+const fs = require("fs");
+const fsp = require("fs/promises");
+const csv = require("csv-parser"); // Assuming you're using a library for CSV parsing
+const nodecallspython = require("node-calls-python");
 
 let mainWindow;
 
-app.on('ready', () => {
+app.on("ready", () => {
   mainWindow = new BrowserWindow({
     width: 800,
     height: 600,
     webPreferences: {
-      preload: path.join(__dirname, 'preload.js'),
-    },
+      preload: path.join(__dirname, "preload.js")
+    }
   });
 
-  mainWindow.loadFile('index.html');
+  mainWindow.loadFile("index.html");
 
   // Register a global shortcut (Ctrl+Shift+I or Cmd+Opt+I on macOS) to toggle DevTools
-  globalShortcut.register('Ctrl+Shift+I', () => {
+  globalShortcut.register("Ctrl+Shift+I", () => {
     mainWindow.webContents.toggleDevTools();
   });
 });
 
-ipcMain.handle('virtualize', async (event, { filePath, type }) => {
+ipcMain.handle("virtualize", async (event, { filePath, type }) => {
   return new Promise((resolve, reject) => {
-    const pythonPath = '/Library/Frameworks/Python.framework/Versions/3.13/bin/python3';
-    const scriptPath = path.join(__dirname, 'virtualize.py');
+    const pythonPath = "python";
+    const scriptPath = path.join(__dirname, "virtualize.py");
 
     const process = spawn(pythonPath, [scriptPath, filePath, type]);
 
-    process.stdout.on('data', (data) => {
-      console.log('Script output:\n', data.toString());
+    process.stdout.on("data", (data) => {
+      console.log("Script output:\n", data.toString());
     });
 
-    process.stderr.on('data', (err) => {
-      console.error('Error:', err.toString());
+    process.stderr.on("data", (err) => {
+      console.error("Error:", err.toString());
     });
 
-    process.on('close', async (code) => {
+    process.on("close", async (code) => {
       if (code === 0) {
         try {
           // const result = await fsp.readFile('result.json', { encoding: 'utf8' });
@@ -55,25 +55,25 @@ ipcMain.handle('virtualize', async (event, { filePath, type }) => {
   });
 });
 
-ipcMain.handle('run-query', async (event, { query, filePath, format }) => {
+ipcMain.handle("run-query", async (event, { query, filePath, format }) => {
   return new Promise((resolve, reject) => {
-    const pythonPath = '/Library/Frameworks/Python.framework/Versions/3.13/bin/python3';
-    const scriptPath = path.join(__dirname, 'run_query.py');
+    const pythonPath = "python";
+    const scriptPath = path.join(__dirname, "run_query.py");
 
     const process = spawn(pythonPath, [scriptPath, query, filePath, format]);
 
-    process.stdout.on('data', (data) => {
-      console.log('Script output:\n', data.toString());
+    process.stdout.on("data", (data) => {
+      console.log("Script output:\n", data.toString());
     });
 
-    process.stderr.on('data', (err) => {
-      console.error('Error:', err.toString());
+    process.stderr.on("data", (err) => {
+      console.error("Error:", err.toString());
     });
 
-    process.on('close', async (code) => {
+    process.on("close", async (code) => {
       if (code === 0) {
         try {
-          const result = await fsp.readFile('result.json', { encoding: 'utf8' });
+          const result = await fsp.readFile("result.json", { encoding: "utf8" });
           resolve(JSON.parse(result));
         } catch (err) {
           reject(`Failed to read or parse the file: ${err.message}`);
@@ -86,21 +86,21 @@ ipcMain.handle('run-query', async (event, { query, filePath, format }) => {
 });
 
 // Listen for the readCsv request from renderer
-ipcMain.handle('read-csv', async (event, filePath) => {
+ipcMain.handle("read-csv", async (event, filePath) => {
   try {
     const rows = [];
 
     console.log(filePath);
 
     const fileStream = fs.createReadStream(filePath).pipe(csv());
-    fileStream.on('data', (data) => rows.push(data));
+    fileStream.on("data", (data) => rows.push(data));
     await new Promise((resolve, reject) => {
-      fileStream.on('end', resolve);
-      fileStream.on('error', reject);
+      fileStream.on("end", resolve);
+      fileStream.on("error", reject);
     });
     return rows;
   } catch (err) {
-    console.error('Error reading CSV:', err);
-    throw new Error('Failed to read CSV');
+    console.error("Error reading CSV:", err);
+    throw new Error("Failed to read CSV");
   }
 });
