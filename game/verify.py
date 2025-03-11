@@ -2,26 +2,19 @@ import sys
 import os
 import json
 from sympy import symbols, simplify, Eq
-import sympy
+import pandas as pd
 
-def is_correct(user_input, correct_equations):
+def is_correct(df, equation):
     try:
+        df["Correct"] = df.apply(lambda row: eval(equation, {}, row.to_dict()), axis=1)
+        # print(df)
 
-        rhs1 = user_input.split('=')[1]  # "b*c"
-        rhs2 = correct_equations.split('=')[1]  # "c*b"
-
-        # Convert to Sympy expressions
-        expr1 = sympy.sympify(rhs1)
-        expr2 = sympy.sympify(rhs2)
-
-        # Check if they are identically equal
-        equivalent = sympy.simplify(expr1 - expr2) == 0
-        if equivalent:  # Compare simplified forms
-            return True  # Match found!
-
-        return False  # No match found
+        all_correct = df["Correct"].all()
+        if all_correct:
+            return True
+        else:
+            return False
     except Exception as e:
-        # print(e)
         return False
 
 # Read arguments from Electron
@@ -41,23 +34,11 @@ else:
     with open("tmp.json", "r") as file:
         data = json.load(file)
 
-# Get answer file path
-file_path = os.path.join(os.path.dirname(__file__), "answers", f"ans{quizNum}.txt")
+csv_path = os.path.join(os.path.dirname(__file__), "quizs", f"quiz{quizNum}.csv")
 
-# Read answers from file
-with open(file_path, "r") as file:
-    lines = file.readlines()
+df = pd.read_csv(csv_path)
+status = is_correct(df, functionInput.replace("=", "=="))
 
-functionInput = functionInput.replace(" ", "")
-
-# Check answers
-for line in lines:  # Skip first line (variable names)
-    answer = line.strip().replace(" ", "")  # Remove spaces
-    if is_correct(functionInput, answer):
-        status = True
-        break
-
-# Store results in tmp.json
 data[quizNum] = {
     "input": functionInput,
     "status": status,

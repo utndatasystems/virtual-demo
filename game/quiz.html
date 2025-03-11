@@ -209,7 +209,7 @@
 
       // Timer function
       function updateTimer() {
-        totalMilliseconds += 10; // Increase by 100 milliseconds
+        totalMilliseconds -= 10; // Increase by 100 milliseconds
 
         const totalSeconds = totalMilliseconds / 1000;
         const minutes = Math.floor(totalSeconds / 60)
@@ -278,7 +278,12 @@
           }
           return false;
         }
-        window.electronAPI.runVerify(quizNum, functionInput, totalMilliseconds - startTime);
+        let result = await window.electronAPI.runVerify(
+          quizNum,
+          functionInput,
+          startTime - totalMilliseconds
+        );
+        console.log("Result:", result);
         return true;
       }
 
@@ -295,7 +300,7 @@
           );
 
           if (confirmSkip) {
-            window.electronAPI.runVerify(quizNum, "None", totalMilliseconds - startTime);
+            window.electronAPI.runVerify(quizNum, "None", startTime - totalMilliseconds);
             window.electronAPI.openQuiz(quizNum + 1, totalMilliseconds); // Skip to the next quiz
           }
         }

@@ -85,14 +85,26 @@ ipcMain.handle("verify", async (event, { quizNum, functionInput, totalSeconds })
     const scriptPath = path.join(__dirname, "verify.py");
 
     const process = spawn(pythonPath, [scriptPath, quizNum, functionInput, totalSeconds]);
+    let outputData = "";
 
     process.stdout.on("data", (data) => {
       console.log("Script output:\n", data.toString());
-      return data.toString();
+      outputData += data.toString();
     });
 
     process.stderr.on("data", (err) => {
       console.error("Error:", err.toString());
+    });
+
+    // Resolve the promise when the script finishes
+    process.on("close", (code) => {
+      console.log(`Python script exited with code ${code}`);
+      resolve(outputData.trim()); // Send final output when script ends
+    });
+
+    process.on("error", (err) => {
+      console.error("Failed to start Python process:", err);
+      reject(err.toString());
     });
   });
 });

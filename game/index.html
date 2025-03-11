@@ -107,8 +107,9 @@
         flex-direction: column;
         justify-content: center;
         align-items: center;
-        padding: 20px;
+        padding: 10px;
         overflow: hidden;
+        height: 90%;
       }
 
       /* Leaderboard Box */
@@ -119,8 +120,9 @@
         backdrop-filter: blur(10px);
         box-shadow: 0px 4px 10px rgba(255, 255, 255, 0.3);
         width: 90%;
-        max-width: 500px;
+        max-width: 90%;
         text-align: center;
+        height: 80%;
         max-height: 100%;
         overflow-y: auto;
       }
@@ -129,6 +131,7 @@
       table {
         border-collapse: collapse;
         width: 100%;
+        height: 80%;
         background: rgba(255, 255, 255, 0.2);
         border-radius: 10px;
         overflow: hidden;
@@ -137,6 +140,8 @@
 
       table th,
       table td {
+        height: 40px; /* Set a fixed row height */
+        line-height: 40px; /* Ensures text is vertically centered */
         border: 1px solid rgba(255, 255, 255, 0.3);
         padding: 10px;
         text-align: center;
@@ -146,18 +151,6 @@
         overflow: hidden; /* Hide overflowing text */
         text-overflow: ellipsis; /* Add "..." when text is too long */
         max-width: 100px; /* Adjust the max width to your preference */
-      }
-
-      table th:nth-child(1),
-      table td:nth-child(1) {
-        width: 50px; /* Adjust width as needed */
-        text-align: center;
-      }
-
-      table th:nth-child(3),
-      table td:nth-child(3) {
-        width: 30px; /* Adjust width as needed */
-        text-align: center;
       }
 
       table th {
@@ -305,7 +298,7 @@
 
     <script>
       document.getElementById("startButton").addEventListener("click", () => {
-        window.electronAPI.openQuiz(1, 0);
+        window.electronAPI.openQuiz(1, 180000);
       });
 
       async function loadLeaderboard() {
