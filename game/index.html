@@ -172,20 +172,65 @@
       }
 
       /* Special Styling for Top 3 */
+      @keyframes crown-glow {
+        0% {
+          transform: scale(1);
+          box-shadow: 0 0 10px gold;
+        }
+        50% {
+          transform: scale(1.1);
+          box-shadow: 0 0 20px gold;
+        }
+        100% {
+          transform: scale(1);
+          box-shadow: 0 0 10px gold;
+        }
+      }
       .first-place {
         background: gold;
         color: black;
         font-weight: bold;
+        animation: crown-glow 1.5s infinite ease-in-out;
+      }
+      @keyframes silver-glow {
+        0% {
+          transform: scale(1);
+          box-shadow: 0 0 10px silver;
+        }
+        50% {
+          transform: scale(1.05);
+          box-shadow: 0 0 20px silver;
+        }
+        100% {
+          transform: scale(1);
+          box-shadow: 0 0 10px silver;
+        }
       }
       .second-place {
         background: silver;
         color: black;
         font-weight: bold;
+        animation: silver-glow 1.5s infinite ease-in-out;
+      }
+      @keyframes bronze-bounce {
+        0% {
+          transform: scale(1);
+          box-shadow: 0 0 10px #cd7f32;
+        }
+        50% {
+          transform: scale(1.01);
+          box-shadow: 0 0 20px #cd7f32;
+        }
+        100% {
+          transform: scale(1);
+          box-shadow: 0 0 10px #cd7f32;
+        }
       }
       .third-place {
         background: #cd7f32;
         color: black;
         font-weight: bold;
+        animation: bronze-bounce 1.2s infinite ease-in-out;
       }
 
       /* Footer */
@@ -230,7 +275,26 @@
                 <th>Total Time</th>
               </tr>
             </thead>
-            <tbody id="leaderboardTableBody"></tbody>
+            <tbody id="leaderboardTableBody">
+              <tr class="first-place">
+                <td>👑 1st</td>
+                <td></td>
+                <td></td>
+                <td></td>
+              </tr>
+              <tr class="second-place">
+                <td>🥈 2nd</td>
+                <td></td>
+                <td></td>
+                <td></td>
+              </tr>
+              <tr class="third-place">
+                <td>🥉 3rd</td>
+                <td></td>
+                <td></td>
+                <td></td>
+              </tr>
+            </tbody>
           </table>
         </div>
       </div>
@@ -274,6 +338,9 @@
           if (index === 2) tr.classList.add("third-place");
           tableBody.appendChild(tr);
         });
+        // if (tableBody.innerHTML === "") {
+        //   tableBody.innerHTML = originalTableBody;
+        // }
       }
 
       window.onload = loadLeaderboard;

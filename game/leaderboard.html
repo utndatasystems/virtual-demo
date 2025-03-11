@@ -232,7 +232,26 @@
               <th>Total Time</th>
             </tr>
           </thead>
-          <tbody id="leaderboardTableBody"></tbody>
+          <tbody id="leaderboardTableBody">
+            <tr class="first-place">
+              <td>👑 1st</td>
+              <td></td>
+              <td></td>
+              <td></td>
+            </tr>
+            <tr class="second-place">
+              <td>🥈 2nd</td>
+              <td></td>
+              <td></td>
+              <td></td>
+            </tr>
+            <tr class="third-place">
+              <td>🥉 3rd</td>
+              <td></td>
+              <td></td>
+              <td></td>
+            </tr>
+          </tbody>
         </table>
       </div>
 
@@ -241,7 +260,7 @@
     </div>
 
     <footer>
-      <span class="footer-text">✨ Keep Improving and Reach the Top! ✨</span>
+      <span class="footer-text">✨ Keep improving and reach the top! ✨</span>
       <button class="home-button" onclick="goHome()">🏠 Back to Home</button>
     </footer>
 
@@ -258,6 +277,7 @@
 
       function displayLeaderboard(players) {
         const tableBody = document.getElementById("leaderboardTableBody");
+        let originalTableBody = tableBody.innerHTML;
         tableBody.innerHTML = ""; // Clear table before adding rows
 
         // Sort players by correct answers DESC, and total time ASC (less time is better)
@@ -305,6 +325,9 @@
 
           tableBody.appendChild(tr);
         });
+        if (tableBody.innerHTML === "") {
+          tableBody.innerHTML = originalTableBody;
+        }
       }
 
       function goHome() {
