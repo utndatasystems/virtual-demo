@@ -4,6 +4,7 @@
 !layout.json
 tmp.csv
 virtual.csv
+game/leaderboard.json
 
 # Node.js
 node_modules/
