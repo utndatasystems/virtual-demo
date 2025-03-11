@@ -198,7 +198,7 @@
     </footer>
 
     <script>
-      // let totalMilliseconds = 0;
+      let timerPaused = false;
       const timerElement = document.getElementById("timer");
       const params = new URLSearchParams(window.location.search);
       const quizNum = parseInt(params.get("quizNum"), 10) || 0;
@@ -209,15 +209,17 @@
 
       // Timer function
       function updateTimer() {
-        totalMilliseconds -= 10; // Increase by 100 milliseconds
+        if (!timerPaused) {
+          totalMilliseconds -= 10; // Increase by 100 milliseconds
 
-        const totalSeconds = totalMilliseconds / 1000;
-        const minutes = Math.floor(totalSeconds / 60)
-          .toString()
-          .padStart(2, "0");
-        const seconds = (totalSeconds % 60).toFixed(2).padStart(5, "0"); // Keep one decimal place
+          const totalSeconds = totalMilliseconds / 1000;
+          const minutes = Math.floor(totalSeconds / 60)
+            .toString()
+            .padStart(2, "0");
+          const seconds = (totalSeconds % 60).toFixed(2).padStart(5, "0"); // Keep one decimal place
 
-        timerElement.textContent = `${minutes}:${seconds}`; // Display time
+          timerElement.textContent = `${minutes}:${seconds}`; // Display time
+        }
       }
 
       // Update every 100ms to show 1 decimal place
@@ -278,13 +280,61 @@
           }
           return false;
         }
-        let result = await window.electronAPI.runVerify(
-          quizNum,
-          functionInput,
-          startTime - totalMilliseconds
+
+        timerPaused = true;
+
+        const waitingWindow = window.open("", "Waiting", "width=300,height=150");
+        waitingWindow.document.write(
+          "<p style='text-align:center;font-size:18px;'>⏳ Verifying...</p>"
         );
-        console.log("Result:", result);
-        return true;
+
+        try {
+          let result = await window.electronAPI.runVerify(
+            quizNum,
+            functionInput,
+            startTime - totalMilliseconds
+          );
+
+          console.log("Result:", result);
+
+          // Close the waiting window
+          waitingWindow.close();
+
+          // Show result window based on verification
+          const resultWindow = window.open("", "Result", "width=300,height=150");
+          if (result.trim().toLowerCase() === "true") {
+            resultWindow.document.write(
+              "<p style='text-align:center;font-size:18px;color:green;'>✅ Correct!</p>"
+            );
+          } else {
+            resultWindow.document.write(
+              "<p style='text-align:center;font-size:18px;color:red;'>❌ Incorrect!</p>"
+            );
+          }
+          return new Promise((resolve) => {
+            let timeElapsed = 0;
+            const timeoutLimit = 5000; // 5 seconds timeout
+
+            const checkClosed = setInterval(() => {
+              timeElapsed += 500; // Increase check time by 500ms
+
+              if (resultWindow.closed) {
+                timerPaused = false;
+                resolve(true);
+                return true;
+              } else if (timeElapsed >= timeoutLimit) {
+                resultWindow.close(); // Close the window after timeout
+                timerPaused = false;
+                resolve(true);
+              }
+            }, 300);
+          });
+        } catch (error) {
+          console.error("Verification error:", error);
+          waitingWindow.close();
+          alert("An error occurred during verification.");
+          return true;
+        }
       }
 
       document.getElementById("nextButton").addEventListener("click", async () => {

@@ -17,7 +17,7 @@ app.on("ready", () => {
     }
   });
 
-  mainWindow.loadFile("index.html");
+  mainWindow.loadFile("html/index.html");
 
   // Register a global shortcut (Ctrl+Shift+I or Cmd+Opt+I on macOS) to toggle DevTools
   globalShortcut.register("Ctrl+Shift+I", () => {
@@ -27,14 +27,14 @@ app.on("ready", () => {
 
 ipcMain.handle("open-quiz", (event, { quizNum, timeStart }) => {
   mainWindow.loadURL(
-    `file://${path.join(__dirname, "quiz.html")}?quizNum=${quizNum}&timeStart=${timeStart}`
+    `file://${path.join(__dirname, "html/quiz.html")}?quizNum=${quizNum}&timeStart=${timeStart}`
   );
 });
 
 ipcMain.handle("getResults", (event, playerName) => {
   return new Promise((resolve, reject) => {
     const pythonPath = "python"; // Adjust path if needed
-    const scriptPath = path.join(__dirname, "result.py");
+    const scriptPath = path.join(__dirname, "scripts/result.py");
 
     const process = spawn(pythonPath, [scriptPath, playerName]);
 
@@ -82,7 +82,7 @@ ipcMain.handle("getLeaderboard", async () => {
 ipcMain.handle("verify", async (event, { quizNum, functionInput, totalSeconds }) => {
   return new Promise((resolve, reject) => {
     const pythonPath = "python";
-    const scriptPath = path.join(__dirname, "verify.py");
+    const scriptPath = path.join(__dirname, "scripts/verify.py");
 
     const process = spawn(pythonPath, [scriptPath, quizNum, functionInput, totalSeconds]);
     let outputData = "";
@@ -108,36 +108,6 @@ ipcMain.handle("verify", async (event, { quizNum, functionInput, totalSeconds })
     });
   });
 });
-
-// ipcMain.handle("run-query", async (event, { query, filePath }) => {
-//   return new Promise((resolve, reject) => {
-//     const pythonPath = "/Library/Frameworks/Python.framework/Versions/3.13/bin/python3";
-//     const scriptPath = path.join(__dirname, "run_query.py");
-
-//     const process = spawn(pythonPath, [scriptPath, query, filePath]);
-
-//     process.stdout.on("data", (data) => {
-//       console.log("Script output:\n", data.toString());
-//     });
-
-//     process.stderr.on("data", (err) => {
-//       console.error("Error:", err.toString());
-//     });
-
-//     process.on("close", async (code) => {
-//       if (code === 0) {
-//         try {
-//           const result = await fsp.readFile("result.json", { encoding: "utf8" });
-//           resolve(JSON.parse(result));
-//         } catch (err) {
-//           reject(`Failed to read or parse the file: ${err.message}`);
-//         }
-//       } else {
-//         reject(`Python script exited with code ${code}`);
-//       }
-//     });
-//   });
-// });
 
 // Listen for the readCsv request from renderer
 ipcMain.handle("read-csv", async (event, quizNum) => {

@@ -5,6 +5,8 @@ from sympy import symbols, simplify, Eq
 import pandas as pd
 
 def is_correct(df, equation):
+    if equation == "None":
+        return False
     try:
         df["Correct"] = df.apply(lambda row: eval(equation, {}, row.to_dict()), axis=1)
         # print(df)
@@ -34,7 +36,7 @@ else:
     with open("tmp.json", "r") as file:
         data = json.load(file)
 
-csv_path = os.path.join(os.path.dirname(__file__), "quizs", f"quiz{quizNum}.csv")
+csv_path = os.path.join(os.path.dirname(__file__), "../quizs", f"quiz{quizNum}.csv")
 
 df = pd.read_csv(csv_path)
 status = is_correct(df, functionInput.replace("=", "=="))
