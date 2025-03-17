@@ -1,5 +1,6 @@
 import pandas as pd
 import virtual
+import duckdb
 import json
 import sys
 import os
@@ -33,20 +34,33 @@ def virtualize(table, type):
       df.to_csv('tmp.csv', index=False)
       table = 'tmp.csv'
   elif type == 'file':
-    # Read the csv.
-    df = pd.read_csv(table)
+    if table.endswith('.csv'):
+      df = pd.read_csv(table)
+    elif table.endswith('.parquet'):
+      # Only read the header. We need this one to differentiate between regular and virtual columns.
+      df = duckdb.sql(f'''
+        select * from read_parquet('{table}') limit 0
+      ''')
   else:
     sys.exit(-1)
   assert df is not None
 
   # Write to vanilla parquet.
-  import pyarrow as pa
-  pa.parquet.write_table(pa.Table.from_pandas(df), 'file.parquet')
+  if table.endswith('.csv'):
+    import pyarrow as pa
+    pa.parquet.write_table(pa.Table.from_pandas(df), 'file.parquet')
+  elif table.endswith('.parquet'):
+    pass
+  else:
+    assert 0
 
   # Apply `virtual`.
   virtual.to_format(table, 'file_virtual.parquet', model_types=['sparse-lr'], prefix='./')
 
+  print(df.columns)
+
   def to_csv(parquet_path, format_path):
+    assert df is not None
     tmp = pd.read_parquet(parquet_path)
     ordered_columns = [col for col in df.columns if col in tmp.columns]
     extra_columns = [col for col in tmp.columns if col not in df.columns]

@@ -1,7 +1,7 @@
 const { app, BrowserWindow, ipcMain, globalShortcut } = require("electron");
 const { spawn } = require("child_process");
 const path = require("path");
-const fs = require("fs");
+const fs = require("fs");        
 const fsp = require("fs/promises");
 const csv = require("csv-parser"); // Assuming you're using a library for CSV parsing
 const nodecallspython = require("node-calls-python");
@@ -102,5 +102,23 @@ ipcMain.handle("read-csv", async (event, filePath) => {
   } catch (err) {
     console.error("Error reading CSV:", err);
     throw new Error("Failed to read CSV");
+  }
+});
+
+// Read Parquet files.
+ipcMain.handle('read-parquet', async (event, filePath) => {
+  try {
+    console.log('Reading Parquet file:', filePath);
+
+    const { asyncBufferFromFile, parquetReadObjects } = await import('hyparquet');
+
+    // Load Parquet file and read objects
+    const file = await asyncBufferFromFile(filePath);
+    const rows = await parquetReadObjects({ file, rowStart: 0, rowEnd: 1000 });
+
+    return rows;
+  } catch (err) {
+    console.error('Error reading Parquet:', err);
+    throw new Error('Failed to read Parquet');
   }
 });

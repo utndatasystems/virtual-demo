@@ -63,7 +63,7 @@
           </label>
         </div>
         <div class="csv-container">
-        <table id="csvTable"></table>
+          <table id="csvTable"></table>
         </div>
       </div>
       <!-- Functions -->
@@ -256,11 +256,21 @@
     });
 
     // Load the CSV into the table
-    async function loadCsv(custom_csv_path) {
+    async function loadCsv(filePath) {
       try {
-        console.log(custom_csv_path);
+        console.log(filePath);
+
+        const isParquet = filePath.endsWith('.parquet');
+        let rows = [];
+
+        if (isParquet) {
+          rows = await window.electronAPI.readParquet(filePath);
+        } else {
+          rows = await window.electronAPI.readCsv(filePath);
+        }
+
         // Fetch the CSV data from the main process
-        let rows = await window.electronAPI.readCsv(custom_csv_path); // Assuming your Electron API provides this method
+        // let rows = await window.electronAPI.readCsv(filepath); // Assuming your Electron API provides this method
         
         console.log(rows);
 
