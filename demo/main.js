@@ -58,12 +58,12 @@ ipcMain.handle('virtualize', async (event, { filePath, type }) => {
   });
 });
 
-ipcMain.handle("run-query", async (event, { query, filePath, format }) => {
+ipcMain.handle("run-query", async (event, { query, filePath, format, shouldRun }) => {
   return new Promise((resolve, reject) => {
     const pythonPath = "python";
     const scriptPath = path.join(__dirname, "run_query.py");
 
-    const process = spawn(pythonPath, [scriptPath, query, filePath, format]);
+    const process = spawn(pythonPath, [scriptPath, query, filePath, format, shouldRun]);
 
     process.stdout.on("data", (data) => {
       console.log("Script output:\n", data.toString());

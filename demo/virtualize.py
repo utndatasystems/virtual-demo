@@ -5,11 +5,12 @@ import json
 import sys
 import os
 
+# Force flushing.
+sys.stdout.reconfigure(line_buffering=True)
+
 import re
 
 pattern = r"pd\.DataFrame\s*\(\s*\{[^}]*\}\s*\)"
-
-sys.stdout.reconfigure(line_buffering=True)
 
 # Example text containing pd.DataFrame with data
 text = """
@@ -109,6 +110,9 @@ def virtualize(table, type):
     json.dump(sizes, f)
   return
  
+if len(sys.argv) != 2:
+  print(f"Usage: python <table> <type:['file', 'code']>")
+
 table = sys.argv[1]
 type = sys.argv[2]
 

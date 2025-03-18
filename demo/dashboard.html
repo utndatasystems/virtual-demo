@@ -38,6 +38,7 @@
 
   <link rel="stylesheet" href="assets/dashboard.css">
   <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" rel="stylesheet">
+  <script src="util.js"></script>
 </head>
 <body>
   <div class="container">
@@ -159,14 +160,25 @@
     rewritten_editor.refresh();
 
     // Event for showing the rewrite.
-    document.getElementById("toggle-query").addEventListener("change", function (e) {
+    document.getElementById("toggle-query").addEventListener("change", async function (e) {
       const view1 = document.getElementById("query-view1")
       const view2 = document.getElementById("query-view2");      
       const rewrittenQueryBox = document.getElementById("rewritten-query-box");
       
       if (e.target.checked) {
         view2.style.display = "block";
-        rewritten_editor.setValue("select avg(\n \"Regular Earnings\" + \"Overtime Earnings\"\n) from table;");
+
+        // Fetch the query.
+        const query = editor.getValue();
+
+        // Get the active option from the button group
+        const active_format = document.querySelector('.button-group').querySelector('.btn-option.active').getAttribute('data-option');
+
+        // Get the rewritten query.
+        const rewritten_query = await window.electronAPI.rewriteQuery(query, csvPath, active_format);
+
+        // Set the query.
+        rewritten_editor.setValue(rewritten_query['query']);
       } else {
         view2.style.display = "none";
       }
@@ -184,8 +196,10 @@
 
     // Execute query on button click
     document.getElementById("run-query").addEventListener("click", async function() {
-      const query = editor.getValue();
       document.getElementById("query-output").innerText = "Executing..";
+
+      // Fetch the query.
+      const query = editor.getValue();
 
       // Get the active option from the button group
       const active_format = document.querySelector('.button-group').querySelector('.btn-option.active').getAttribute('data-option');
@@ -254,84 +268,67 @@
         document.getElementById("query-output").innerText += "\nNo results found.";
       }
     });
-
-    // Load the CSV into the table
-    async function loadCsv(filePath) {
-      console.log('Loading the table..');
-      try {
-        console.log(filePath);
-
-        const isParquet = filePath.endsWith('.parquet');
-        let rows = [];
-
-        if (isParquet) {
-          rows = await window.electronAPI.readParquet(filePath);
-        } else {
-          rows = await window.electronAPI.readCsv(filePath);
-        }
-
-        // Fetch the CSV data from the main process
-        // let rows = await window.electronAPI.readCsv(filepath); // Assuming your Electron API provides this method
-        
-        console.log(rows);
-
-        // Check if the CSV data is empty or invalid
-        if (!rows || rows.length === 0) {
-          throw new Error('No data found in CSV file');
-        }
-
-        // Limit the number of rows to 1,000
-        rows = rows.slice(0, 1000);
-
-        const table = document.getElementById('csvTable'); // Assuming there's a table with id 'csvTable'
-        
-        // Create table header from the first row of the CSV data
-        const headerRow = Object.keys(rows[0]); // Use the keys of the first object as the header row
-        
-        // Clear any existing content in the table
-        table.innerHTML = '';
-
-        // Create table header
-        const thead = table.createTHead();
-        const header = thead.insertRow();
-        
-        headerRow.forEach(colName => {
-          const th = document.createElement('th');
-          th.textContent = colName;
-          th.addEventListener('click', () => generateSql(colName)); // Add click event to generate SQL for column
-          header.appendChild(th);
-        });
-
-        // Create table body
-        const tbody = table.createTBody();
-        rows.forEach((row, index) => {
-          const tr = tbody.insertRow();
-          headerRow.forEach(colName => {
-            const td = tr.insertCell();
-            td.textContent = row[colName]; // Access each cell value using the column name
-          });
-
-          // Add alternating row background color
-          if (index % 2 === 0) {
-            tr.style.backgroundColor = '#f9f9f9'; // Even rows
-          } else {
-            tr.style.backgroundColor = '#ffffff'; // Odd rows
-          }
-          
-          // Add hover effect for rows
-          tr.addEventListener('mouseover', () => {
-            tr.style.backgroundColor = '#f1f1f1';
-          });
-          tr.addEventListener('mouseout', () => {
-            tr.style.backgroundColor = index % 2 === 0 ? '#f9f9f9' : '#ffffff';
-          });
-        });
-      } catch (err) {
-        console.error('Error loading CSV:', err);
-        alert('Failed to load CSV. Please check the file path.');
-      }
-    }
   
+    // Function to generate and display the formulas
+    function generateFormulas(functions) {
+      const formulasContainer = document.getElementById('formulas');
+      
+      let myround = (x) => {
+        let int_repr = Math.round(x);
+        if (Math.abs(x - int_repr) < 1e-6) {
+          return int_repr;
+        } else {
+          return x.toFixed(4);
+        }
+      }
+
+      functions.greedy.chosen.forEach(item => {
+        const model_type = item['model-type'];
+        const terms = item[model_type].coeffs;
+
+        // Create the formula in LaTeX format
+        const formula = terms.map(term => {
+          const rounded_coef = myround(term.coeff);
+          const col_name = term['col-name'];
+          if (rounded_coef === 1)
+            return `${col_name}`;
+          return `${rounded_coef} * ${col_name}`;
+        }).join(' + ');
+
+        console.log(formula);
+
+        // Wrap the formula in LaTeX math syntax
+        const latexFormula = `<code>${item['target-name']} = ${formula}</code>`;
+
+        // Create a button element to hold the formula and append it to the page
+        const formulaButton = document.createElement('button');
+        formulaButton.innerHTML = `${latexFormula}`; // MathJax will render this LaTeX code
+        formulaButton.classList.add('formula-button');
+
+        // Add click event listener to populate the SQL query textarea and editor
+        formulaButton.addEventListener('click', () => {
+          const queryBox = document.getElementById('query-box');
+
+          // Dynamically generate the AVG query
+          const avgQuery = `min("${item['target-name']}")`;
+
+          // Log the computed values
+          console.log('Formula:', formula);
+          console.log('Min query:', avgQuery);
+
+          // Update the editor with the AVG query
+          if (typeof editor !== 'undefined' && editor.setValue) {
+            editor.setValue(`select ${avgQuery}\nfrom table;`);
+          }
+
+          // Update the query box for reference
+          queryBox.value = `${item.target_name} = ${formula}`;
+        });
+
+        formulasContainer.appendChild(formulaButton);
+      });
+    }
+
     document.getElementById("toggle-query").addEventListener("change", function() {
       const queryBox = document.getElementById("query-box");
       
@@ -360,66 +357,6 @@
     //   }
     // }
 
-    // Function to generate and display the formulas
-    function generateFormulas() {
-      const formulasContainer = document.getElementById('formulas');
-      
-      let myround = (x) => {
-        let int_repr = Math.round(x);
-        if (Math.abs(x - int_repr) < 1e-6) {
-          return int_repr;
-        } else {
-          return x.toFixed(4);
-        }
-      }
-
-      functions.greedy.chosen.forEach(item => {
-        console.log(item);
-        const model_type = item['model_type'];
-        const coeffs = item[model_type].coeffs;
-
-        console.log(coeffs);
-
-        // Create the formula in LaTeX format
-        const formula = coeffs.map(coeff => {
-          const rounded_coef = myround(coeff.coeff);
-          if (rounded_coef === 1) {
-            return `${coeff.col_name}`;
-          }
-          return `${rounded_coef} * ${coeff.col_name}`; // LaTeX with <code> style
-        }).join(' + ');
-
-        // Wrap the formula in LaTeX math syntax
-        const latexFormula = `<code>${item.target_name} = ${formula}</code>`;
-
-        // Create a button element to hold the formula and append it to the page
-        const formulaButton = document.createElement('button');
-        formulaButton.innerHTML = `${latexFormula}`; // MathJax will render this LaTeX code
-        formulaButton.classList.add('formula-button');
-
-        // Add click event listener to populate the SQL query textarea and editor
-        formulaButton.addEventListener('click', () => {
-          const queryBox = document.getElementById('query-box');
-
-          // Dynamically generate the AVG query
-          const avgQuery = `avg("${item.target_name}")`;
-
-          // Log the computed values
-          console.log('Formula:', formula);
-          console.log('AVG Query:', avgQuery);
-
-          // Update the editor with the AVG query
-          if (typeof editor !== 'undefined' && editor.setValue) {
-            editor.setValue(`select ${avgQuery}\nfrom table;`);
-          }
-
-          // Update the query box for reference
-          queryBox.value = `${item.target_name} = ${formula}`;
-        });
-
-        formulasContainer.appendChild(formulaButton);
-      });
-    }
 
     // // Additional styles for the buttons (optional)
     // document.querySelectorAll('.formula-button').forEach(button => {
@@ -436,102 +373,6 @@
     //     sizesContainer.appendChild(document.createElement('br'));
     //   }
     // }
-
-    function generateSizes() {
-  // Data for the chart
-  // const sizes = { virtual: 5000000, parquet: 12000000 }; // Example data
-  const labels = Object.keys(sizes); // ["virtual", "parquet"]
-    const data = Object.values(sizes).map(size => size / 1000000); // Convert to MB
-
-    let colors = []
-    if (data.length === 2) {
-      colors = ['#b97f45', '#1f80df']; // Colors for the bars
-    } else if (data.length === 3) {
-      colors = ['#95393a', '#b97f45', '#1f80df']; // Colors for the bars
-    } else {
-      assert(0);
-    }
-
-    // Create the bar chart
-    const ctx = document.getElementById('barChart').getContext('2d');
-    new Chart(ctx, {
-      type: 'bar',
-      data: {
-        labels: labels,
-        datasets: [{
-          data: data,
-          backgroundColor: colors, // Bar colors
-          // borderColor: colors, // Border colors
-          borderWidth: 1
-        }]
-      },
-      options: {
-        plugins: {
-          legend: {
-            display: false, // Enable legend
-          },
-          tooltip: {
-            callbacks: {
-              label: function(tooltipItem) {
-                // Format the tooltip to show the value in MB
-                return tooltipItem.raw.toFixed(2) + ' MB';
-              }
-            }
-          }
-        },
-        scales: {
-          y: {
-            beginAtZero: true,
-            title: {
-              display: true,
-              text: 'Size (MB)',
-              font: {
-                size: 14 // Y-axis title font size
-              }
-            },
-            ticks: {
-              font: {
-                size: 12 // Y-axis tick font size
-              }
-            }
-          }
-        }
-      }
-    });
-  }
-
-    function generateSql(column) {
-      selectedColumn = column;
-      const query = `SELECT ${column} FROM csv`; // SQL query for selected column
-      showModal(query);
-    }
-
-    function showModal(query) {
-      const modal = document.getElementById('sqlModal');
-      const sqlQueryTextarea = document.getElementById('sqlQuery');
-      sqlQueryTextarea.value = query;
-      modal.style.display = 'block';
-    }
-
-    function closeModal() {
-      const modal = document.getElementById('sqlModal');
-      modal.style.display = 'none';
-    }
-
-    async function runSQLQuery() {
-      const query = document.getElementById('sqlQuery').value;
-      try {
-        const result = await window.electronAPI.runSQL(query); // Execute SQL in Electron
-
-
-        console.log(result);
-
-        alert(`Query Result:\n${JSON.stringify(result, null, 2)}`);
-      } catch (err) {
-        console.error('Error running SQL:', err);
-        alert('Failed to execute SQL query.');
-      }
-    }
 
     // Toggle the option buttons.
     document.querySelector('.button-group').querySelectorAll('.btn-option').forEach(button => {
@@ -565,8 +406,8 @@
     (async function init() {
       await loadCsv(csvPath);
       // displayColumnSizes();
-      generateFormulas();
-      generateSizes();
+      generateFormulas(functions);
+      generateSizes(sizes);
     })();
   </script>  
 </body>
