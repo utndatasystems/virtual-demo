@@ -84,19 +84,17 @@ def virtualize(table, type):
   #   tmp.to_csv(format_path, index=False)
   #   return
 
-  # to_csv('file_virtual.parquet', 'virtual.csv')
-  
   # Report the sizes.
   if table.endswith('.csv'):
     sizes = {
       'csv' : os.path.getsize(table),
-      'parquet' : os.path.getsize('file.parquet'),
-      'virtual': os.path.getsize('file_virtual.parquet')
+      'virtual[csv]': os.path.getsize('file_virtual.parquet')
     }
   elif table.endswith('.parquet'):
+    # TODO: Detect compression technique.
     sizes = {
       'parquet' : os.path.getsize(table),
-      'virtual': os.path.getsize('file_virtual.parquet')
+      'virtual[parquet]': os.path.getsize('file_virtual.parquet')
     }
   else:
     assert 0
