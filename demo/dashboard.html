@@ -44,10 +44,10 @@
     <header>
       <div class="very-special-header">
         <h1><a href="index.html" style="color: inherit; text-decoration: none;"><code>Virtual</code></a>: Dashboard</h1>
-        <div class="button-group1">
-          <button class="btn-option active" data-option="sample"><code>sample</code></button>
-          <button class="btn-option" data-option="lineitem"><code>lineitem (TPC-H)</code></button>
-        </div>
+        <!-- <div class="button-group1"> -->
+          <!-- <button class="btn-option active" data-option="sample"><code>sample</code></button> -->
+          <!-- <button class="btn-option" data-option="lineitem"><code>lineitem (TPC-H)</code></button> -->
+        <!-- </div> -->
       </div>
     </header>    
     <!-- Top Section -->
@@ -176,7 +176,7 @@
     document.getElementById("toggle-virtual").addEventListener("change", async (e) => {
       console.log('sinide hre')
       if (e.target.checked) {
-        await loadCsv('virtual.csv');
+        await loadCsv('file_virtual.parquet');
       } else {
         await loadCsv(csvPath)
       }
@@ -257,6 +257,7 @@
 
     // Load the CSV into the table
     async function loadCsv(filePath) {
+      console.log('Loading the table..');
       try {
         console.log(filePath);
 
@@ -373,7 +374,11 @@
       }
 
       functions.greedy.chosen.forEach(item => {
-        const coeffs = item['sparse-lr'].coeffs;
+        console.log(item);
+        const model_type = item['model_type'];
+        const coeffs = item[model_type].coeffs;
+
+        console.log(coeffs);
 
         // Create the formula in LaTeX format
         const formula = coeffs.map(coeff => {
@@ -437,7 +442,15 @@
   // const sizes = { virtual: 5000000, parquet: 12000000 }; // Example data
   const labels = Object.keys(sizes); // ["virtual", "parquet"]
     const data = Object.values(sizes).map(size => size / 1000000); // Convert to MB
-    const colors = ['#95393a', '#b97f45', '#1f80df']; // Colors for the bars
+
+    let colors = []
+    if (data.length === 2) {
+      colors = ['#b97f45', '#1f80df']; // Colors for the bars
+    } else if (data.length === 3) {
+      colors = ['#95393a', '#b97f45', '#1f80df']; // Colors for the bars
+    } else {
+      assert(0);
+    }
 
     // Create the bar chart
     const ctx = document.getElementById('barChart').getContext('2d');
@@ -551,7 +564,6 @@
     // Initialize the script
     (async function init() {
       await loadCsv(csvPath);
-      console.log('here')
       // displayColumnSizes();
       generateFormulas();
       generateSizes();

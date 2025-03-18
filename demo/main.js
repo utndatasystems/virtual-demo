@@ -25,25 +25,28 @@ app.on("ready", () => {
   });
 });
 
-ipcMain.handle("virtualize", async (event, { filePath, type }) => {
+ipcMain.handle('virtualize', async (event, { filePath, type }) => {
   return new Promise((resolve, reject) => {
-    const pythonPath = "python";
-    const scriptPath = path.join(__dirname, "virtualize.py");
+    const pythonPath = 'python';
+    const scriptPath = path.join(__dirname, 'virtualize.py');
 
     const process = spawn(pythonPath, [scriptPath, filePath, type]);
 
-    process.stdout.on("data", (data) => {
-      console.log("Script output:\n", data.toString());
+    process.stdout.on('data', (data) => {
+      const message = data.toString();
+      console.log('Script output:\n', message);
+      event.sender.send('virtualize-log', message); // Send logs to the renderer
     });
 
-    process.stderr.on("data", (err) => {
-      console.error("Error:", err.toString());
+    process.stderr.on('data', (err) => {
+      const errorMsg = err.toString();
+      console.error('Error:', errorMsg);
+      event.sender.send('virtualize-log', `Error: ${errorMsg}`); // Send errors to the renderer
     });
 
-    process.on("close", async (code) => {
+    process.on('close', async (code) => {
       if (code === 0) {
         try {
-          // const result = await fsp.readFile('result.json', { encoding: 'utf8' });
           resolve();
         } catch (err) {
           reject(`Failed to read or parse the file: ${err.message}`);
@@ -113,8 +116,10 @@ ipcMain.handle('read-parquet', async (event, filePath) => {
     const { asyncBufferFromFile, parquetReadObjects } = await import('hyparquet');
 
     // Load Parquet file and read objects
+    console.log('Start reading the Parquet file with hyparquet..');
     const file = await asyncBufferFromFile(filePath);
     const rows = await parquetReadObjects({ file, rowStart: 0, rowEnd: 1000 });
+    console.log('Finished reading the Parquet file with hyparquet!')
 
     return rows;
   } catch (err) {

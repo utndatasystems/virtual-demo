@@ -2,6 +2,11 @@ const { ipcRenderer } = require('electron');
 let csvData = []; // Store the parsed CSV data
 let headers = [];
 
+ipcRenderer.on('virtualize-log', (event, message) => {
+  console.log('Live Log:', message);
+  // You can also append this to a UI element if needed
+});
+
 // Handle file parsing and CSV data rendering
 ipcRenderer.on('file-parsed', (event, { data, headers: fileHeaders }) => {
   csvData = data;
