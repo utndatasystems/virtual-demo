@@ -41,7 +41,7 @@ def execute_query(query, file_path, format, should_run):
 
   return ret, query_time, metal_query_time
 
-if len(sys.argv) == 5:
+if len(sys.argv) != 5:
   print(f'Usage: python3 {sys.argv[0]} <query> <file-path> <format> <should-run>')
   sys.exit(-1)
 
@@ -76,9 +76,14 @@ else:
   rewritten_query = result
 
   # Replace with `from table`.
-  rewritten_query = re.sub(rf'from read_parquet("{file_path}")', f'from table', rewritten_query, flags=re.IGNORECASE)
+  rewritten_query = re.sub(
+    rf'from read_parquet\("file_virtual.parquet"\)', 
+    'from table', 
+    rewritten_query, 
+    flags=re.IGNORECASE
+  )
 
   # Write the query.
   with open('result.json', 'w', encoding='utf-8') as f:
     import json
-    json.dump({'query_time': query_time, 'metal_query_time': metal_query_time, 'header': None, 'data': None, 'query' : result}, f, indent=2)
+    json.dump({'query_time': query_time, 'metal_query_time': metal_query_time, 'header': None, 'data': None, 'query' : rewritten_query}, f, indent=2)
