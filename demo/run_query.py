@@ -41,6 +41,10 @@ def execute_query(query, file_path, format, should_run):
 
   return ret, query_time, metal_query_time
 
+if len(sys.argv) == 5:
+  print(f'Usage: python3 {sys.argv[0]} <query> <file-path> <format> <should-run>')
+  sys.exit(-1)
+
 query = sys.argv[1]
 file_path = sys.argv[2]
 format = sys.argv[3]

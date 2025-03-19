@@ -28,7 +28,9 @@ async function loadCsv(filePath) {
     if (isParquet) {
       rows = await window.electronAPI.readParquet(filePath);
     } else {
+      console.log('started!!!!');
       rows = await window.electronAPI.readCsv(filePath);
+      console.log('after????');
     }
 
     // Fetch the CSV data from the main process

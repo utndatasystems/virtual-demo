@@ -91,17 +91,22 @@ ipcMain.handle("run-query", async (event, { query, filePath, format, shouldRun }
 // Listen for the readCsv request from renderer
 ipcMain.handle("read-csv", async (event, filePath) => {
   try {
-    const rows = [];
+    return new Promise((resolve, reject) => {
+      const rows = [];
+      const fileStream = fs.createReadStream(filePath).pipe(csv());
 
-    console.log(filePath);
+      fileStream.on("data", (data) => {
+        if (rows.length < 1000) {
+          rows.push(data);
+        } else {
+          fileStream.destroy(); // Stop reading further
+        }
+      });
 
-    const fileStream = fs.createReadStream(filePath).pipe(csv());
-    fileStream.on("data", (data) => rows.push(data));
-    await new Promise((resolve, reject) => {
-      fileStream.on("end", resolve);
+      fileStream.on("close", () => resolve(rows));
+      fileStream.on("end", () => resolve(rows));
       fileStream.on("error", reject);
     });
-    return rows;
   } catch (err) {
     console.error("Error reading CSV:", err);
     throw new Error("Failed to read CSV");

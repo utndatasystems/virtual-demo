@@ -86,12 +86,18 @@ def virtualize(table, type):
 
   # Report the sizes.
   if table.endswith('.csv'):
+    # Have a virtual csv file.
+    duckdb.query(f"COPY (SELECT * FROM 'file_virtual.parquet') TO 'file_virtual.csv' (FORMAT CSV, HEADER TRUE)")
+    assert os.path.isfile('file_virtual.csv')
+
+    # Declare the sizes.
     sizes = {
       'csv' : os.path.getsize(table),
-      'virtual[csv]': os.path.getsize('file_virtual.parquet')
+      'virtual[csv]': os.path.getsize('file_virtual.csv')
     }
   elif table.endswith('.parquet'):
     # TODO: Detect compression technique.
+    # Declare the sizes.
     sizes = {
       'parquet' : os.path.getsize(table),
       'virtual[parquet]': os.path.getsize('file_virtual.parquet')
@@ -107,9 +113,12 @@ def virtualize(table, type):
   with open('sizes.json', 'w') as f:
     json.dump(sizes, f)
   return
- 
-if len(sys.argv) != 2:
+
+# Check the number of args. 
+if len(sys.argv) != 3:
+  print(sys.argv)
   print(f"Usage: python <table> <type:['file', 'code']>")
+  sys.exit(-1)
 
 table = sys.argv[1]
 type = sys.argv[2]

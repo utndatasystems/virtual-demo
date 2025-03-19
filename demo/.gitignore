@@ -1,7 +1,7 @@
 *.parquet
 *.json
 tmp.csv
-virtual.csv
+file_virtual.csv
 
 # Node.js
 node_modules/
