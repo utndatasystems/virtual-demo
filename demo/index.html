@@ -19,6 +19,12 @@
   <!-- <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&display=swap" rel="stylesheet"> -->
   <link href='https://fonts.googleapis.com/css?family=Inter' rel='stylesheet'>
 
+  <!-- Include xterm.js CSS -->
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/xterm/css/xterm.css" />
+
+  <!-- Include xterm.js JS -->
+  <script src="https://cdn.jsdelivr.net/npm/xterm/lib/xterm.js"></script>
+
   <link rel="stylesheet" href="assets/index.css">
 </head>
 <body>
@@ -62,6 +68,14 @@ df = pd.DataFrame({
 })
       </textarea>
     </div>
+    <!-- Terminal Container -->
+    <div id="terminal-container">
+      <div id="terminal-header">
+        <span>Terminal</span>
+        <button id="toggle-terminal">⏷</button>
+      </div>
+      <div id="terminal-output"></div>
+    </div>
   </div>
 
   <!-- CodeMirror JS -->
@@ -80,9 +94,9 @@ df = pd.DataFrame({
     });
 
     // Loader element
-    const loader = document.createElement('div');
-    loader.classList.add('loader');  // You can style this in CSS
-    loader.innerHTML = 'Preparing the dashboard...';
+    // const loader = document.createElement('div');
+    // loader.classList.add('loader');  // You can style this in CSS
+    // loader.innerHTML = 'Preparing the dashboard...';
 
     // Add event listener for the drop event
     dropArea.addEventListener('drop', async (e) => {
@@ -95,13 +109,13 @@ df = pd.DataFrame({
       localStorage.setItem('csvPath', file.path);
 
       // Show the loader
-      document.body.appendChild(loader);
+      // document.body.appendChild(loader);
 
       // Send query to the main process to run the Python script
       await window.electronAPI.virtualize(file.path, 'file');
 
       // Hide the loader and redirect to dashboard.html
-      document.body.removeChild(loader);
+      // document.body.removeChild(loader);
       window.location.href = 'dashboard.html';
     });
 
@@ -117,7 +131,7 @@ df = pd.DataFrame({
           // alert("Running the following code:\n" + code);
 
           // Show the loader
-          document.body.appendChild(loader);
+          // document.body.appendChild(loader);
 
           // Send query to the main process to run the Python script
           await window.electronAPI.virtualize(code, 'code');
@@ -125,7 +139,7 @@ df = pd.DataFrame({
           localStorage.setItem('csvPath', 'tmp.csv')
 
           // Hide the loader and redirect to dashboard.html
-          document.body.removeChild(loader);
+          // document.body.removeChild(loader);
           window.location.href = 'dashboard.html';
         },
       },
@@ -137,6 +151,44 @@ df = pd.DataFrame({
       document.getElementById("query-box"),
       editorSettings
     );
+
+    const terminalContainer = document.getElementById('terminal-container');
+const terminalOutput = document.getElementById('terminal-output');
+const toggleButton = document.getElementById('toggle-terminal');
+
+// Toggle terminal visibility
+toggleButton.addEventListener('click', () => {
+  terminalContainer.classList.toggle('collapsed');
+  toggleButton.textContent = terminalContainer.classList.contains('collapsed') ? '⏵' : '⏷';
+});
+
+// Function to append log messages
+function appendToTerminal(message) {
+  const newMessage = document.createElement('div');
+  newMessage.textContent = message;
+  terminalOutput.appendChild(newMessage);
+
+  // Always scroll to the bottom after appending a new message
+  terminalOutput.scrollTop = terminalOutput.scrollHeight;
+}
+
+// Listen for log events from the main process
+window.electronAPI.receive('virtualize-log', (message) => {
+  appendToTerminal(message);
+});
+
+// Function to hide terminal when a plot is shown
+function hideTerminalForPlot() {
+  terminalContainer.classList.add('collapsed');
+  toggleButton.textContent = '⏵';
+}
+
+// Listen for the event when a plot is displayed
+window.electronAPI.receive('show-plot', () => {
+  hideTerminalForPlot();
+});
+
+
   </script>
 </body>
 </html>

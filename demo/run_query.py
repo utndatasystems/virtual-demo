@@ -4,6 +4,7 @@ import virtual
 import re
 import math
 import time
+import json
 
 # Force flushing.
 sys.stdout.reconfigure(line_buffering=True)
@@ -66,6 +67,10 @@ if should_run:
 
   # Include the DataFrame header (column names).
   header = result.columns.tolist()
+
+  result_cleaned = json.dumps(result_cleaned, default=str)
+
+  print(result_cleaned)
 
   # And write the result, including headers, to a JSON file.
   with open('result.json', 'w', encoding='utf-8') as f:

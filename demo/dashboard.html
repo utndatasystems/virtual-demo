@@ -207,6 +207,8 @@
       // Send query to the main process to run the Python script
       const result = await window.electronAPI.runQuery(query, csvPath, active_format);
 
+      console.log(result);
+
       const outputArea = document.getElementById("query-output");
 
       // Clear the output area.
@@ -226,7 +228,10 @@
       outputArea.appendChild(document.createElement('br'));
       outputArea.appendChild(document.createElement('br'));
 
-      if (Array.isArray(result.data) && result.data.length > 0) {
+      // Ensure result.data is an array
+      let dataArray = typeof result.data === "string" ? JSON.parse(result.data) : result.data;
+
+      if (Array.isArray(dataArray) && result.data.length > 0) {
         // Clear existing results
 
         // Create a table
@@ -250,9 +255,9 @@
         table.appendChild(headerRow);
 
         // Create table rows
-        result.data.forEach((row) => {
+        dataArray.forEach((row) => {
           const tableRow = document.createElement("tr");
-          Object.values(row).forEach((cell) => {
+          row.forEach((cell) => {  // Use `row` directly instead of `Object.values(row)`
             const td = document.createElement("td");
             td.style.border = "1px solid #ddd";
             td.style.padding = "8px";
