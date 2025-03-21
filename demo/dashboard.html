@@ -90,11 +90,13 @@
               <button class="btn-option" data-option="parquet"><code>parquet</code></button>
               <button class="btn-option active" data-option="virtual"><code>virtual</code></button>
             </div>
-            <code class="switch-text">Show rewrite</code>
-            <label class="switch">
-              <input type="checkbox" id="toggle-query">
-              <span class="slider"></span>
-            </label>
+            <div id="virtual-switch" style="display: block;">
+              <code class="switch-text">Show rewrite</code>
+              <label class="switch" >
+                <input type="checkbox" id="toggle-query">
+                <span class="slider"></span>
+              </label>
+            </div>
           </div>
           <div class="query-container">
             <div id="query-view1">
@@ -383,25 +385,26 @@
     document.querySelector('.button-group').querySelectorAll('.btn-option').forEach(button => {
       button.addEventListener('click', () => {
         // Remove active class from all buttons
-
-        console.log(button);
         let option = button.getAttribute('data-option');
         console.log(option);
-        if (option === 'parquet') {
-          // const view1 = document.getElementById("query-view1")
+
+        // Check whcih option the user selected.
+        if (option !== 'virtual') {
           const view2 = document.getElementById("query-view2");      
-          // const rewrittenQueryBox = document.getElementById("rewritten-query-box");
-          
-          // if (e.target.checked) {
-            // view2.style.display = "block";
-            // rewritten_editor.setValue("select avg(\n \"Regular Earnings\" + \"Overtime Earnings\"\n) from table;");
-          // } else {
-          view2.style.display = "none";
-          document.getElementById('toggle-query').checked = false; 
-          // }
+          view2.style.display = 'none';
+
+          // Untoggle.
+          document.getElementById('toggle-query').checked = false;
+
+          // Make it disappear.
+          document.getElementById('virtual-switch').style.display = 'none';
+        } else {
+          // Make it reappear.
+          document.getElementById('virtual-switch').style.display = 'block';  
         }
 
         document.querySelector('.button-group').querySelectorAll('.btn-option').forEach(btn => btn.classList.remove('active'));
+        
         // Add active class to the clicked button
         button.classList.add('active');
       });

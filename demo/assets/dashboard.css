@@ -250,11 +250,9 @@ canvas {
 .switch-text {
   font-size: 16px;
   color: black;
-  margin-right: -17.5%;
-  /* margin-left: 20px; */
   pointer-events: none;
   display: flex;
-  align-items: center; 
+  align-items: right;
 }
 
 .switch-text2 {
