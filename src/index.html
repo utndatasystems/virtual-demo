@@ -52,13 +52,13 @@ df = pd.DataFrame({
       </textarea>
     </div>
   </div>
-  <div id="terminal-container">
+  <div id="terminal-container" class="collapsed"> <!-- Ensure it's collapsed initially -->
     <div id="terminal-header">
       <span>Terminal</span>
-      <button id="toggle-terminal">⏷</button>
+      <button id="toggle-terminal">⏵</button> <!-- Change default icon -->
     </div>
     <div id="terminal-output"></div>
-  </div>
+  </div>  
   
 
   <!-- CodeMirror JS -->
@@ -135,24 +135,39 @@ df = pd.DataFrame({
       editorSettings
     );
 
-    const terminalContainer = document.getElementById('terminal-container');
-const terminalOutput = document.getElementById('terminal-output');
+// Ensure the toggle button starts with the correct icon
+const terminalContainer = document.getElementById('terminal-container');
 const toggleButton = document.getElementById('toggle-terminal');
+const terminalOutput = document.getElementById('terminal-output');
 
-// Toggle terminal visibility
 toggleButton.addEventListener('click', () => {
   terminalContainer.classList.toggle('collapsed');
   toggleButton.textContent = terminalContainer.classList.contains('collapsed') ? '⏵' : '⏷';
 });
 
-// Function to append log messages
+// Function to check if the user is at the bottom of the terminal
+function isScrolledToBottom() {
+  return terminalOutput.scrollHeight - terminalOutput.clientHeight <= terminalOutput.scrollTop + 10;
+}
+
+// Function to append log messages and uncollapse terminal if needed
 function appendToTerminal(message) {
+  // Uncollapse the terminal if it's collapsed
+  if (terminalContainer.classList.contains('collapsed')) {
+    terminalContainer.classList.remove('collapsed');
+    toggleButton.textContent = '⏷';
+  }
+
+  const wasScrolledToBottom = isScrolledToBottom();
+
   const newMessage = document.createElement('div');
   newMessage.textContent = message;
   terminalOutput.appendChild(newMessage);
 
-  // Always scroll to the bottom after appending a new message
-  terminalOutput.scrollTop = terminalOutput.scrollHeight;
+  // Scroll to bottom only if the user was already at the bottom
+  if (wasScrolledToBottom) {
+    terminalOutput.scrollTop = terminalOutput.scrollHeight;
+  }
 }
 
 // Listen for log events from the main process
