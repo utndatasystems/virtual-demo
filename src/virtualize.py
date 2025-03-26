@@ -21,13 +21,13 @@ df = pd.DataFrame({
 """
 
 match = re.search(pattern, text)
-if match:
-  print(match.group(0))
+# if match:
+#   print(match.group(0))
 
 import sys
 
 def virtualize(table, type):
-  print(f'[type] {table} {type}')
+  # print(f'[type] {table} {type}')
   df = None
   if type == 'code':
     match = re.search(pattern, table)
@@ -48,12 +48,18 @@ def virtualize(table, type):
     sys.exit(-1)
   assert df is not None
 
-  # Write to vanilla parquet.
+  # Store the parquet file.
+  output_file = 'file.parquet'
+
+  # First remove the file (or the symbolic link).
+  if os.path.exists(output_file) or os.path.islink(output_file):
+    os.remove(output_file)
+
   if table.endswith('.csv'):
     import pyarrow as pa
-    pa.parquet.write_table(pa.Table.from_pandas(df), 'file.parquet')
+    pa.parquet.write_table(pa.Table.from_pandas(df), output_file)
   elif table.endswith('.parquet'):
-    pass
+    os.symlink(os.path.abspath(table), output_file)
   else:
     assert 0
 
@@ -66,13 +72,10 @@ def virtualize(table, type):
   if not os.path.isfile(schema_filepath):
     schema_filepath = None  
 
-  print(f'Possible schema file: {schema_filepath}')
+  # print(f'Possible schema file: {schema_filepath}')
 
   # Apply `virtual`.
-  print(f'Virtualizing the file..')
   virtual.to_format(table, 'file_virtual.parquet', model_types=['sparse-lr', 'custom'], schema=schema_filepath, prefix='./')
-
-  print(df.columns)
 
   # This is too slow. We directly read from Parquet with `hyparquet`.
   # def to_csv(parquet_path, format_path):
@@ -116,7 +119,6 @@ def virtualize(table, type):
 
 # Check the number of args. 
 if len(sys.argv) != 3:
-  print(sys.argv)
   print(f"Usage: python <table> <type:['file', 'code']>")
   sys.exit(-1)
 
