@@ -35,7 +35,12 @@ ipcMain.handle('virtualize', async (event, { filePath, type }) => {
     process.stdout.on('data', (data) => {
       const message = data.toString();
       console.log('Script output:\n', message);
-      event.sender.send('virtualize-log', message); // Send logs to the renderer
+    
+      // Split by newline.
+      const parts = message.split('\n');
+      for (const part of parts) {
+        event.sender.send('virtualize-log', part);
+      }
     });
 
     process.stderr.on('data', (err) => {
