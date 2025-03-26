@@ -90,7 +90,7 @@
               <button class="btn-option" data-option="parquet"><code>parquet</code></button>
               <button class="btn-option active" data-option="virtual"><code>virtual</code></button>
             </div>
-            <div id="virtual-switch" style="display: block;">
+            <div id="virtual-switch">
               <code class="switch-text">Show rewrite</code>
               <label class="switch" >
                 <input type="checkbox" id="toggle-query">
@@ -398,11 +398,15 @@
           // Untoggle.
           document.getElementById('toggle-query').checked = false;
 
-          // Make it disappear.
-          document.getElementById('virtual-switch').style.display = 'none';
+          // Make it disappear but keep the space occupied.
+          const virtualSwitch = document.getElementById('virtual-switch');
+          virtualSwitch.style.opacity = '0';  // Makes it invisible
+          virtualSwitch.style.pointerEvents = 'none';  // Makes it non-interactive
         } else {
           // Make it reappear.
-          document.getElementById('virtual-switch').style.display = 'block';  
+          const virtualSwitch = document.getElementById('virtual-switch');
+          virtualSwitch.style.opacity = '1';  // Makes it visible
+          virtualSwitch.style.pointerEvents = 'auto';  // Makes it interactive again
         }
 
         document.querySelector('.button-group').querySelectorAll('.btn-option').forEach(btn => btn.classList.remove('active'));

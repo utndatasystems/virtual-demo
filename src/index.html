@@ -161,9 +161,6 @@ function appendToTerminal(message) {
   const wasScrolledToBottom = isScrolledToBottom();
 
   const newMessage = document.createElement('div');
-  // if (!message.endsWith('\n')) {
-  //   message += '\n';
-  // }
   newMessage.textContent = message;
   terminalOutput.appendChild(newMessage);
 

@@ -216,20 +216,24 @@ canvas {
   background-color: #e0e0e0; /* Slight hover effect for inactive buttons */
 }
 
-.switch {
-  position: relative;
-  display: inline-flex;
-  align-items: center;  /* Align the slider vertically with the text */
+#virtual-switch {
+  display: flex;  /* Ensures the child elements are aligned horizontally */
+  align-items: center;  /* Vertically centers the elements */
 }
 
 .switch-text {
   font-size: 16px;
   color: black;
-  margin-right: -17.5%;
-  /* margin-left: 20px; */
-  pointer-events: none;
-  display: flex;
-  align-items: center; 
+  display: inline-block; /* Ensures it stays on the same line */
+  margin: 0; /* Remove any unwanted margins */
+  line-height: 1; /* Helps with vertical centering */
+  /* margin-right: 10px; */
+}
+
+.switch {
+  position: relative;
+  display: inline-flex; /* Ensures the checkbox and slider stay on the same line */
+  align-items: center;
 }
 
 .switch-text2 {
