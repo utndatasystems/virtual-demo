@@ -179,6 +179,8 @@
         // Get the rewritten query.
         const rewritten_query = await window.electronAPI.rewriteQuery(query, csvPath, active_format);
 
+        console.log(rewritten_query);
+
         // Set the query.
         rewritten_editor.setValue(rewritten_query['query']);
       } else {
@@ -305,7 +307,7 @@
         console.log(formula);
 
         // Wrap the formula in LaTeX math syntax
-        const latexFormula = `<code>${item['target-name']} = ${formula}</code>`;
+        const latexFormula = `<code>${item['target-name']} = [...]</code>`;
 
         // Create a button element to hold the formula and append it to the page
         const formulaButton = document.createElement('button');

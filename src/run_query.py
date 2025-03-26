@@ -13,7 +13,10 @@ def execute_query(query, file_path, format, should_run):
   # Regular expression to find "FROM <table_name>"
   if format == 'virtual':
     file_path = 'file_virtual.parquet' #file_path.replace('.csv', '.parquet')
-
+  elif format == 'parquet':
+    file_path = 'file.parquet'
+  else:
+    assert 0
   
   query = re.sub(r'\bfrom\s+(\w+)', f'from read_parquet("{file_path}")', query, flags=re.IGNORECASE)
 
