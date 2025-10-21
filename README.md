@@ -1,10 +1,6 @@
 # `Virtual`: Demo
 
-If you want to run the `demo`, please do:
-
-`cd demo`.
-
-# Setup
+## Setup
 
 Let's install the requirements:
 
@@ -19,10 +15,11 @@ brew install node
 brew install npm
 ```
 
-# Installation
+## Installation
 
+`cd src`
 `npm install`
 
-# Run
+## Run
 
 `npm start`
