@@ -1,5 +1,6 @@
 *.parquet
 *.json
+!package.json
 tmp.csv
 file_virtual.csv
 

@@ -1,0 +1,21 @@
+{
+  "name": "virtual-demo",
+  "version": "1.0.0",
+  "description": "Virtual Demo",
+  "main": "main.js",
+  "scripts": {
+    "start": "env PATH=$PATH electron .",
+    "build": "electron-packager . virtual-demo --platform=darwin,win32,linux"
+  },
+  "dependencies": {
+    "csv-parser": "^3.0.0",
+    "electron": "^26.0.0",
+    "hyparquet": "^1.9.0",
+    "node-calls-python": "^1.10.1"
+  },
+  "devDependencies": {
+    "electron-packager": "^17.1.0"
+  },
+  "author": "Mihail Stoian",
+  "license": "MIT"
+}

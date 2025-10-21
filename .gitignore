@@ -1,5 +1,5 @@
+data/
 *.parquet
-*.json
 !sizes.json
 !layout.json
 tmp.csv
