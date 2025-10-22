@@ -17,7 +17,7 @@ function closeModal() {
 }
 
 // Load the CSV into the table
-async function loadCsv(filePath) {
+async function loadCsv(filePath, header_array=null) {
   console.log('Loading the table..');
   try {
     console.log(filePath);
@@ -49,7 +49,18 @@ async function loadCsv(filePath) {
     const table = document.getElementById('csvTable'); // Assuming there's a table with id 'csvTable'
     
     // Create table header from the first row of the CSV data
-    const headerRow = Object.keys(rows[0]); // Use the keys of the first object as the header row
+    var headerRow = Object.keys(rows[0]); // Use the keys of the first object as the header row
+
+    if (header_array && Array.isArray(header_array)) {
+      // Sort headerRow according to 'header' order, extras go to the end
+      const headerSet = new Set(header_array);
+      const sortedHeaderRow = [
+        ...header_array.filter(h => headerRow.includes(h)),
+        ...headerRow.filter(h => !headerSet.has(h))
+      ];
+      headerRow = sortedHeaderRow;
+    }
+    console.log('Header Row:', headerRow);
     
     // Clear any existing content in the table
     table.innerHTML = '';
@@ -89,6 +100,7 @@ async function loadCsv(filePath) {
         tr.style.backgroundColor = index % 2 === 0 ? '#f9f9f9' : '#ffffff';
       });
     });
+    return headerRow;
   } catch (err) {
     console.error('Error loading CSV:', err);
     alert('Failed to load CSV. Please check the file path.');

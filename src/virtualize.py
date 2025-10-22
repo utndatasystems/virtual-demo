@@ -69,7 +69,7 @@ def virtualize(table, type):
 
   # Check if we already have the schema for this file.
   schema_filepath = f'schema_{csv_basename_noext}.json'
-  if not os.path.isfile(schema_filepath):
+  if not os.path.isfile(schema_filepath) or type == 'code':
     schema_filepath = None  
 
   # print(f'Possible schema file: {schema_filepath}')

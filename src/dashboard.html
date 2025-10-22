@@ -187,12 +187,14 @@
         view2.style.display = "none";
       }
     });
+    
 
+    var header = null;
     // Event for showing the virtual file.
     document.getElementById("toggle-virtual").addEventListener("change", async (e) => {
       console.log('sinide hre')
       if (e.target.checked) {
-        await loadCsv('file_virtual.parquet');
+        await loadCsv('file_virtual.parquet', header);
       } else {
         await loadCsv(csvPath)
       }
@@ -418,7 +420,9 @@
   
     // Initialize the script
     (async function init() {
-      await loadCsv(csvPath);
+      console.log('Loading CSV from path:', csvPath);
+      header = await loadCsv(csvPath);
+      console.log('CSV Header:', header);
       // displayColumnSizes();
       generateFormulas(functions);
       generateSizes(sizes);
