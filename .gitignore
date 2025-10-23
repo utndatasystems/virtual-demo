@@ -1,5 +1,5 @@
 data/
-*.parquet
+!sample/taxi_2019_04_1M-rows.parquet
 !sizes.json
 !layout.json
 tmp.csv
