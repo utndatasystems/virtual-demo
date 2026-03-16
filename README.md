@@ -17,8 +17,10 @@ brew install npm
 
 ## Installation
 
-`cd src`
-`npm install`
+```
+cd src
+npm install
+```
 
 ## Run
 
